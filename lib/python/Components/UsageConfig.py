@@ -442,9 +442,13 @@ def InitUsageConfig():
 		("300", _("normal")),
 		("100", _("fast"))])
 	config.lcd = ConfigSubsection()	
-	config.lcd.modeminitv4k = ConfigSelection(default = "0", choices = [
+	config.lcd.modeminitv4k = ConfigSelection(default = "disable", choices = [
         	("disable", _("normal")),
 		("enable", _("MiniTV"))])
+	config.lcd.modepip = ConfigSelection(default = "0", choices = [
+        	("0", _("off")),
+		("1", _("on"))])
+		
 			
 
 	def SpinnerOnOffChanged(configElement):
