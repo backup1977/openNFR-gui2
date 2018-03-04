@@ -160,13 +160,6 @@ def command(comandline, strip=1):
 INFO_Panel_Version = 'Info-Panel V2.0 (mod by OpenNFR)'
 boxversion = getBoxType()
 print "[Info-Panel] boxversion: %s"  % (boxversion)
-if getBoxType() in ('e4hdultra'):
-	if config.lcd.modepip.value == "1":
-		print '[E4HDUltra ]activate minitvPIP'
-		os.system("echo '1' > /proc/stb/lcd/live_decoder")
-	if config.lcd.modeminitv4k.value == "enable":
-		print '[E4HDUltra ] activate minitv'
-		os.system("echo 'enable' > /proc/stb/lcd/live_enable")
 panel = open("/tmp/infopanel.ver", "w")
 panel.write(INFO_Panel_Version + '\n')
 panel.write("Boxversion: %s " % (boxversion)+ '\n')
