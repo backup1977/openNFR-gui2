@@ -130,7 +130,7 @@ int eDVBAudio::startPid(int pid, int type)
 #ifdef DREAMBOX
 			bypass = 7;
 #else
-			bypass = 7;
+			bypass = 0x22;
 #endif
 			break;
 		}
@@ -314,7 +314,7 @@ eDVBVideo::eDVBVideo(eDVBDemux *demux, int dev)
 #ifdef DREAMBOX
 #define VIDEO_STREAMTYPE_H265_HEVC 22
 #else
-#define VIDEO_STREAMTYPE_H265_HEVC 22
+#define VIDEO_STREAMTYPE_H265_HEVC 7
 #endif
 #define VIDEO_STREAMTYPE_AVS 16
 
