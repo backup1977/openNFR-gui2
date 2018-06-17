@@ -46,7 +46,7 @@ class About(Screen):
 			cpuMHz = "   (1,3 GHz)"
 		elif getMachineBuild() in ('u5','u53','u52','u51','u5pvr','h9'):
 			cpuMHz = "   (1,6 GHz)"			
-		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dags7252'):
+		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dm900', 'dags7252'):
 			cpuMHz = "   (1,7 GHz)"
 		elif getMachineBuild() in ('sf5008','et13000','et1x000','hd52','hd51','sf4008','vs1500','h7'):
                         try:
@@ -115,7 +115,7 @@ class About(Screen):
 		AboutText += _("Installed:\t\t%s") % about.getFlashDateString() + "\n"			
 		AboutText += _("Last Upgrade:\t\t%s") % about.getLastUpdateString() + "\n\n" 
 		AboutText += _("WWW:\t\t%s") % about.getImageUrlString() + "\n\n"
-		AboutText += _("based on:\t\t%s") % "www.github.com/oe-alliance" + "\n\n"
+		AboutText += _("Image Build:\t\t%s") % "by Ghani" + "\n\n"
 
 		self["FPVersion"] = StaticText(fp_version)
 
