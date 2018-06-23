@@ -106,7 +106,7 @@ config.defaultskinSetup.steps = ConfigSelection([('default Utopia',_("default Ut
 if config.defaultskinSetup.steps.value == "default Utopia":
        	DEFAULT_SKIN = "Blue-Line-OCT-4NFR/skin.xml"
 elif config.defaultskinSetup.steps.value == "default SmokeR":
-       	DEFAULT_SKIN = "skin_default/skin.xml"        
+       	DEFAULT_SKIN = "Blue-Line-OCT-4NFR/skin.xml"        
 
 if not fileExists(resolveFilename(SCOPE_SKIN, DEFAULT_SKIN)):
 	# in that case, fallback to Magic (which is an SD skin)
