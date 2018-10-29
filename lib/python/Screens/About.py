@@ -46,7 +46,7 @@ class About(Screen):
 			cpuMHz = "   (1,3 GHz)"
 		elif getMachineBuild() in ('u51','u5','u52','u5pvr','h9','cc1','sf8008','hd60','i55plus'):
 			cpuMHz = "   (1,6 GHz)"			
-		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dags7252', '8100s'):
+		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dm900', 'dags7252', '8100s'):
 			cpuMHz = "   (1,7 GHz)"
 		elif getMachineBuild() in ('alien5','u53'):
 			cpuMHz = "   (2,0 GHz)"
@@ -189,7 +189,7 @@ class About(Screen):
 		self["FPVersion"] = StaticText(fp_version)
 
 		AboutText += _("WWW:\t\t%s") % about.getImageUrlString() + "\n\n"
-		AboutText += _("based on:\t\t%s") % "www.github.com/oe-alliance" + "\n\n"
+		AboutText += _("Image Build:\t\t%s") % "by Ghani" + "\n\n"
                 # don't remove the string out of the _(), or it can't be "translated" anymore.
 		# TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
 		info = _("TRANSLATOR_INFO")
