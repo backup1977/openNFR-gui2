@@ -1,823 +1,970 @@
-from boxbranding import getMachineProcModel, getMachineBuild, getBoxType, getMachineName, getImageDistro, getMachineBrand, getImageFolder, getMachineRootFile, getImageArch  
-from Screens.Screen import Screen
-from Screens.Console import Console
-from Screens.Setup import Setup
-from Screens.MessageBox import MessageBox
-from Screens.ChoiceBox import ChoiceBox
-from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Components.Button import Button
-from Components.ActionMap import ActionMap, NumberActionMap
-from Components.MenuList import MenuList
-from Components.Input import Input
-from Components.Label import Label
-from Components.ProgressBar import ProgressBar
-from Components.Pixmap import Pixmap, MultiPixmap
-from Components.config import *
+# -*- coding: utf-8 -*-
+
+#This plugin is free software, you are allowed to
+#modify it (if you keep the license),
+#but you are not allowed to distribute/publish
+#it without source code (this version and your modifications).
+#This means you also have to distribute
+#source code of your modifications.
+
+from enigma import eTimer, ePicLoad, getDesktop, loadPic
+from Components.ActionMap import ActionMap
+from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigSelection, ConfigYesNo, NoSave, ConfigNothing, ConfigNumber, configfile, ConfigBoolean
 from Components.ConfigList import ConfigListScreen
-import Components.Harddisk
-from Tools.LoadPixmap import LoadPixmap
-from Tools.Directories import fileExists
-import os
-from skin import parseColor
-PLUGINVERSION = '1.00'
-NFR4XBootInstallation_Skin = '\n\t\t<screen name="NFR4XBootInstallation" position="center,center" size="902,380" title="NFR4XBoot - Installation" >\n\t\t      <widget name="label1" position="10,10" size="840,30" zPosition="1" halign="center" font="Regular;25" backgroundColor="#9f1313" transparent="1"/>\n\t\t      <widget name="label2" position="10,80" size="840,290" zPosition="1" halign="center" font="Regular;20" backgroundColor="#9f1313" transparent="1"/>\n\t\t      <widget name="config" position="10,160" size="840,200" scrollbarMode="showOnDemand" transparent="1"/>\n\t\t      <ePixmap pixmap="skin_default/buttons/red.png" position="10,290" size="140,40" alphatest="on" />\n\t\t      <ePixmap pixmap="skin_default/buttons/green.png" position="150,290" size="140,40" alphatest="on" />\n\t\t      <ePixmap pixmap="skin_default/buttons/blue.png" position="300,290" size="140,40" alphatest="on" />\n\t\t      <widget name="key_red" position="10,290" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />\n\t\t      <widget name="key_green" position="150,290" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />\n\t\t      <widget name="key_blue" position="300,290" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t\t</screen>'
-NFR4XBootImageChoose_Skin = '\n\t\t<screen name="NFR4XBootImageChoose" position="center,center" size="902,380" title="NFR4XBoot - Menu">\n\t\t\t<widget name="label2" position="145,10" size="440,30" zPosition="1" font="Regular;20" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="label3" position="145,35" size="440,30" zPosition="1" font="Regular;20" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="label4" position="145,60" size="440,30" zPosition="1" font="Regular;20" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="label5" position="145,85" size="440,30" zPosition="1" font="Regular;20" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="label6" position="420,10" size="440,30" zPosition="1" halign="right" font="Regular;20" backgroundColor="#9f1313" foregroundColor="#00389416" transparent="1" />\n\t\t\t<widget name="label7" position="420,35" size="440,30" zPosition="1" halign="right" font="Regular;20" backgroundColor="#9f1313" foregroundColor="#00389416" transparent="1" />\n\t\t\t<widget name="label8" position="420,60" size="440,30" zPosition="1" halign="right" font="Regular;20" backgroundColor="#9f1313" foregroundColor="#00389416" transparent="1" />\n\t\t\t<widget name="label9" position="420,85" size="440,30" zPosition="1" halign="right" font="Regular;20" backgroundColor="#9f1313" foregroundColor="#00389416" transparent="1" />\n\t\t\t<widget name="label10" position="145,110" size="440,30" zPosition="1" font="Regular;20" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="label11" position="420,110" size="440,30" zPosition="1" halign="right" font="Regular;20" backgroundColor="#9f1313" foregroundColor="#00389416" transparent="1" />\n\t\t\t<widget name="label1" position="25,145" size="840,22" zPosition="1" halign="center" font="Regular;18" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="device_icon" position="25,20" size="80,80" alphatest="on" />\n\t\t\t<widget name="free_space_progressbar" position="265,42" size="500,13" borderWidth="1" zPosition="3" />\n\t\t\t<widget name="config" position="25,180" size="840,150" scrollbarMode="showOnDemand" />\n\t\t\t<ePixmap pixmap="skin_default/buttons/red.png" position="10,340" size="150,40" alphatest="on" />\n\t\t\t<ePixmap pixmap="skin_default/buttons/green.png" position="185,340" size="150,40" alphatest="on" />\n\t\t\t<ePixmap pixmap="skin_default/buttons/yellow.png" position="360,340" size="150,40" alphatest="on" />\n\t\t\t<ePixmap pixmap="skin_default/buttons/blue.png" position="535,340" size="150,40" alphatest="on" />\n\t\t\t<widget name="key_red" position="5,center" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="key_green" position="180,340" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />\n\t\t\t<widget name="key_yellow" position="355,340" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t\t\t<widget name="key_blue" position="530,340" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t\t<widget name="key_menu" position="705,340" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" /><ePixmap pixmap="skin_default/buttons/menu.png" position="710,340" size="150,40" alphatest="on" /></screen>'
-NFR4XBootImageInstall_Skin = '\n\t\t    <screen name="NFR4XBootImageInstall" position="center,center" size="770,340" title="NFR4XBoot - Image Installation" >\n\t\t\t      <widget name="config" position="10,10" size="750,220" scrollbarMode="showOnDemand" transparent="1"/>\n\t\t\t      <ePixmap pixmap="skin_default/buttons/red.png" position="10,290" size="140,40" alphatest="on" />\n\t\t\t      <ePixmap pixmap="skin_default/buttons/green.png" position="150,290" size="140,40" alphatest="on" />\n\t\t\t      <ePixmap pixmap="skin_default/buttons/yellow.png" position="290,290" size="140,40" alphatest="on" />\n\t\t\t      <widget name="HelpWindow" position="330,310" zPosition="5" size="1,1" transparent="1" alphatest="on" />      \n\t\t\t      <widget name="key_red" position="10,290" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />\n\t\t\t      <widget name="key_green" position="150,290" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />\n\t\t\t      <widget name="key_yellow" position="290,290" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t\t    </screen>'
-
-def Freespace(dev):
-    statdev = os.statvfs(dev)
-    space = statdev.f_bavail * statdev.f_frsize / 1024
-    print '[NFR4XBoot] Free space on %s = %i kilobytes' % (dev, space)
-    return space
-
-
-class NFR4XBootInstallation(Screen):
-
-    def __init__(self, session):
-        self.skin = NFR4XBootInstallation_Skin
-        Screen.__init__(self, session)
-        self.list = []
-        self['config'] = MenuList(self.list)
-        self['key_red'] = Label(_('Install'))
-        self['key_green'] = Label(_('Cancel'))
-        self['key_blue'] = Label(_('Devices Panel'))
-        self['label1'] = Label(_('Welcome to NFR4XBoot %s MultiBoot Plugin installation.') % PLUGINVERSION)
-        self['label2'] = Label(_('Here is the list of mounted devices in Your STB\n\nPlease choose a device where You would like to install NFR4XBoot:'))
-        self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {'red': self.install,
-         'green': self.close,
-         'back': self.close,
-         'blue': self.devpanel})
-        self.updateList()
-
-    def updateList(self):
-        myusb, myhdd, mymmc = ('', '', '')
-        myoptions = []
-        if fileExists('/proc/mounts'):
-            fileExists('/proc/mounts')
-            f = open('/proc/mounts', 'r')
-            for line in f.readlines():
-                if line.find('/media/usb') != -1:
-                    myusb = '/media/usb/'
-                    continue
-                if line.find('/media/mmc') != -1:
-                    mymmc = '/media/mmc/'
-                    continue
-                if line.find('/hdd') != -1:
-                    myhdd = '/media/hdd/'
-                    continue
-
-            f.close()
-        else:
-            self['label2'].setText(_('Sorry it seems that there are not Linux formatted devices mounted on your STB. To install NFR4XBoot you need a Linux formatted part1 device. Click on the blue button to open NFR Devices Panel'))
-            fileExists('/proc/mounts')
-        if myusb:
-            self.list.append(myusb)
-        else:
-            myusb
-        if mymmc:
-            self.list.append(mymmc)
-        else:
-            mymmc
-        if myhdd:
-            myhdd
-            self.list.append(myhdd)
-        else:
-            myhdd
-        self['config'].setList(self.list)
-
-    def devpanel(self):
-        try:
-			####ersetzen mit unseren Mountmanager####
-            from Screens.HddSetup import HddSetup
-            self.session.open(HddSetup)
-        except:
-            self.session.open(MessageBox, _('You are not running NFR Image. You must mount devices Your self.'), MessageBox.TYPE_INFO)
-
-    def myclose(self):
-        self.close()
-
-    def myclose2(self, message):
-        self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-        os.system('reboot -p')
-        self.close()
-
-    def checkReadWriteDir(self, configele):
-        import os.path
-        import Components.Harddisk
-        supported_filesystems = frozenset(('ext4', 'ext3', 'ext2', 'nfs'))
-        candidates = []
-        mounts = Components.Harddisk.getProcMounts()
-        for partition in Components.Harddisk.harddiskmanager.getMountedPartitions(False, mounts):
-            if partition.filesystem(mounts) in supported_filesystems:
-                candidates.append((partition.description, partition.mountpoint))
-
-        if candidates:
-            locations = []
-            for validdevice in candidates:
-                locations.append(validdevice[1])
-
-            if Components.Harddisk.findMountPoint(os.path.realpath(configele)) + '/' in locations or Components.Harddisk.findMountPoint(os.path.realpath(configele)) in locations:
-                if fileExists(configele, 'w'):
-                    return True
-                else:
-                    dir = configele
-                    self.session.open(MessageBox, _('The directory %s is not writable.\nMake sure you select a writable directory instead.') % dir, type=MessageBox.TYPE_ERROR)
-                    return False
-            else:
-                dir = configele
-                self.session.open(MessageBox, _('The directory %s is not a EXT2, EXT3, EXT4 or NFS partition.\nMake sure you select a valid partition type.') % dir, type=MessageBox.TYPE_ERROR)
-                return False
-        else:
-            dir = configele
-            self.session.open(MessageBox, _('The directory %s is not a EXT2, EXT3, EXT4 or NFS partition.\nMake sure you select a valid partition type.') % dir, type=MessageBox.TYPE_ERROR)
-            return False
-
-    def install(self):
-        check = False
-        if fileExists('/proc/mounts'):
-            fileExists('/proc/mounts')
-            f = open('/proc/mounts', 'r')
-            for line in f.readlines():
-                if line.find('/media/usb') != -1:
-                    check = True
-                    continue
-                if line.find('/media/mmc') != -1:
-                    check = True
-                    continue
-                if line.find('/hdd') != -1:
-                    check = True
-                    continue
-
-            f.close()
-        else:
-            fileExists('/proc/mounts')
-        if check == False:
-            self.session.open(MessageBox, _('Sorry, there is not any connected devices in your STB.\nPlease connect HDD or USB to install NFR4X Multiboot!'), MessageBox.TYPE_INFO)
-        else:
-            fileExists('/boot/dummy')
-            self.mysel = self['config'].getCurrent()
-            if self.checkReadWriteDir(self.mysel):
-                message = _('Do You really want to install NFR4XBoot in:\n ') + self.mysel + '?'
-                ybox = self.session.openWithCallback(self.install2, MessageBox, message, MessageBox.TYPE_YESNO)
-                ybox.setTitle(_('Install Confirmation'))
-            else:
-                self.close()
-                
-    def install2(self, yesno):
-	config.NFRBootmanager = ConfigSubsection()
-	config.NFRBootmanager.bootmanagertimeout = ConfigSelection([('5',_("5 seconds")),('10',_("10 seconds")),('15',_("15 seconds")),('20',_("20 seconds")),('30',_("30 seconds"))], default='5')	
-        if getMachineBuild() in ("u5", "u51", "u52", "u53", "u5pvr"):
-            self.install3(False)
-        elif yesno:
-            self.MACHINEBRAND = getMachineBrand()
-            if  self.MACHINEBRAND == "Vu+":
-                os.system("opkg install packagegroup-base-nfs")	
-            message = _('Do you want to use Bootmanager by booting?\nBox will reboot after choice ')
-            ybox = self.session.openWithCallback(self.install3, MessageBox, message, MessageBox.TYPE_YESNO)
-            ybox.setTitle(_('Install Confirmation'))
-        else:
-            self.session.open(MessageBox, _('Installation aborted !'), MessageBox.TYPE_INFO)                
-
-    def install3(self, yesno):
-        print "yesno:", yesno
-        if yesno:
-            cmd2 = 'mkdir /media/nfr4xboot;mount ' + self.mysel + ' /media/nfr4xboot'
-            os.system(cmd2)
-            if fileExists('/proc/mounts'):
-                fileExists('/proc/mounts')
-                f = open('/proc/mounts', 'r')
-                for line in f.readlines():
-                    if line.find(self.mysel):
-		        mntdev = line.split(' ')[0]
-                f.close()
-                mntid = os.system('blkid -s UUID -o value ' + mntdev + '>/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/bin/install')
-                os.system("mv /etc/fstab /etc/fstab1")
-                os.system("grep -v  /media/nfr4xboot /etc/fstab1 > /etc/fstab")
-                os.system("rm /etc/fstab1")
-                os.system('blkid -s UUID -o value ' + mntdev + '>/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/bin/install')
-                fstabuuid = os.popen('blkid -s UUID -o value ' + mntdev).read()
-                fstabuuidwrite = 'UUID=' + fstabuuid.strip() + '        /media/nfr4xboot        auto        defaults	       1        1'
-                fileHandle = open ('/etc/fstab', 'a')
-                fileHandle.write(fstabuuidwrite)
-                fileHandle.close()                
-            cmd = 'mkdir ' + self.mysel + 'NFR4XBootI;mkdir ' + self.mysel + 'NFR4XBootUpload'
-            os.system(cmd)
-            os.system('cp /sbin/nfr4x_multiboot /sbin/nfr4xinit')
-            os.system('chmod 777 /sbin/nfr4xinit;chmod 777 /sbin/init;ln -sfn /sbin/nfr4xinit /sbin/init')
-            os.system('mv /etc/init.d/volatile-media.sh /etc/init.d/volatile-media.sh.back')
-            out3 = open('/media/nfr4xboot/NFR4XBootI/.timer', 'w')
-            out3.write(config.NFRBootmanager.bootmanagertimeout.value)
-            out3.close()	
-            out2 = open('/media/nfr4xboot/NFR4XBootI/.nfr4xboot', 'w')
-            out2.write('Flash')
-            out2.close()
-            out = open('/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location', 'w')
-            out.write(self.mysel)
-            out.close()
-            os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location /etc/nfr4x/')
-            image = getImageDistro()
-            if fileExists('/etc/image-version'):
-                if 'build' not in image:
-                    f = open('/etc/image-version', 'r')
-                    for line in f.readlines():
-                        if 'build=' in line:
-                            image = image + ' build ' + line[6:-1]
-                            open('/media/nfr4xboot/NFR4XBootI/.Flash', 'w').write(image)
-                            break
-
-                    f.close()
-            self.myclose2(_('NFR4XBoot has been installed succesfully!'))
-        else:
-            cmd2 = 'mkdir /media/nfr4xboot;mount ' + self.mysel + ' /media/nfr4xboot'
-            os.system(cmd2)
-            if fileExists('/proc/mounts'):
-                fileExists('/proc/mounts')
-                f = open('/proc/mounts', 'r')
-                for line in f.readlines():
-                    if line.find(self.mysel):
-		        mntdev = line.split(' ')[0]
-                f.close()
-                mntid = os.system('blkid -s UUID -o value ' + mntdev + '>/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/bin/install')
-                os.system("mv /etc/fstab /etc/fstab1")
-                os.system("grep -v  /media/nfr4xboot /etc/fstab1 > /etc/fstab")
-                os.system("rm /etc/fstab1")
-                os.system('blkid -s UUID -o value ' + mntdev + '>/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/bin/install')
-                fstabuuid = os.popen('blkid -s UUID -o value ' + mntdev).read()
-                fstabuuidwrite = 'UUID=' + fstabuuid.strip() + '        /media/nfr4xboot        auto        defaults	       1        1'
-                fileHandle = open('/etc/fstab', 'a')
-                fileHandle.write(fstabuuidwrite)
-                fileHandle.close()
-            cmd = 'mkdir ' + self.mysel + 'NFR4XBootI;mkdir ' + self.mysel + 'NFR4XBootUpload'
-            os.system(cmd)
-            os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/bin/nfr4xinitnoboot /sbin/nfr4xinit')
-            os.system('chmod 777 /sbin/nfr4xinit;chmod 777 /sbin/init;ln -sfn /sbin/nfr4xinit /sbin/init')
-            os.system('mv /etc/init.d/volatile-media.sh /etc/init.d/volatile-media.sh.back')
-            out2 = open('/media/nfr4xboot/NFR4XBootI/.nfr4xboot', 'w')
-            out2.write('Flash')
-            out2.close()
-            out = open('/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location', 'w')
-            out.write(self.mysel)
-            out.close()
-            os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location /etc/nfr4x/')
-            image = getImageDistro()
-            if fileExists('/etc/image-version'):
-                if 'build' not in image:
-                    f = open('/etc/image-version', 'r')
-                    for line in f.readlines():
-                        if 'build=' in line:
-                            image = image + ' build ' + line[6:-1]
-                            open('/media/nfr4xboot/NFR4XBootI/.Flash', 'w').write(image)
-                            break
-
-                    f.close()
-            self.myclose2(_('NFR4XBoot has been installed succesfully, and Box rebooting now!'))
-
-class NFR4XBootImageChoose(Screen):
-
-    def __init__(self, session):
-        self.skin = NFR4XBootImageChoose_Skin
-        Screen.__init__(self, session)
-        self.list = []
-        self.setTitle('NFR4XBoot %s - Menu' % PLUGINVERSION)
-        self['device_icon'] = Pixmap()
-        self['free_space_progressbar'] = ProgressBar()
-        self['linea'] = ProgressBar()
-        self['config'] = MenuList(self.list)
-        self['key_red'] = Label(_('Boot Image'))
-        self['key_green'] = Label(_('Install Image'))
-        self['key_yellow'] = Label(_('Remove Image '))
-        self['key_blue'] = Label(_('Uninstall'))
-        self['key_menu'] = Label(_('Bootsetup'))        
-        self['label2'] = Label(_('NFR4XBoot is running from:'))
-        self['label3'] = Label(_('Used:'))
-        self['label4'] = Label(_('Available:'))
-        self['label5'] = Label(_('NFR4XBoot is running image:'))
-        self['label6'] = Label('')
-        self['label7'] = Label('')
-        self['label8'] = Label('')
-        self['label9'] = Label('')
-        self['label10'] = Label(_('Number of installed images in NFR4XBoot:'))
-        self['label11'] = Label('')
-        self['label1'] = Label(_('Here is the list of installed images in Your STB. Please choose an image to boot.'))
-        self['actions'] = ActionMap(['WizardActions', 'ColorActions', 'MenuActions'], {'red': self.boot,
-         'green': self.install,
-         'yellow': self.remove,
-         'blue': self.advanced,
-         'menu': self.bootsetup,         
-         'back': self.close})
-        self.onShow.append(self.updateList)
-        
-    def bootsetup(self):
-        menulist = []
-        if getMachineBuild() not in ("u5", "u51", "u52", "u53", "u5pvr"):
-            menulist.append((_('Use Bootmanager by Booting'), 'withnfr4xboot'))
-            menulist.append((_('Boot without Bootmanager'), 'withoutnfr4xboot'))
-	    menulist.append((_('Setup Bootmanagertimeout'), 'bootmanagertimeout'))
-        else:
-            menulist.append((_('Boot without Bootmanager'), 'withoutnfr4xboot'))	
-        self.session.openWithCallback(self.menuBootsetupCallback, ChoiceBox, title=_('What would You like to do ?'), list=menulist)
-    def menuBootsetupCallback(self, choice):
-	config.NFRBootmanager = ConfigSubsection()
-	config.NFRBootmanager.bootmanagertimeout = ConfigSelection([('5',_("5 seconds")),('10',_("10 seconds")),('15',_("15 seconds")),('20',_("20 seconds")),('30',_("30 seconds"))], default='5')	
-        self.show()
-        if choice is None:
-            return
-        else:
-            if choice[1] == 'withnfr4xboot':
-                cmd0 = 'cp /sbin/nfr4x_multiboot /sbin/nfr4xinit'
-                cmd1 = 'chmod 777 /sbin/nfr4xinit;chmod 777 /sbin/init;ln -sfn /sbin/nfr4xinit /sbin/init'
-                self.session.openWithCallback(self.close, Console, _('NFR4XBoot work with Bootmanager by Booting!'), [cmd0, cmd1])
-            if choice[1] == 'withoutnfr4xboot':
-                cmd0 = 'cp /usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/bin/nfr4xinitnoboot /sbin/nfr4xinit'
-                cmd1 = 'chmod 777 /sbin/nfr4xinit;chmod 777 /sbin/init;ln -sfn /sbin/nfr4xinit /sbin/init'
-                self.session.openWithCallback(self.updateList, Console, _('NFR4XBoot work without Bootmanager by Booting!'), [cmd0, cmd1])
-            if choice[1] == 'bootmanagertimeout':
-                self.session.openWithCallback(self.setupDone, Setup, 'bootmanagertimeout', 'Extensions/Infopanel')
-	    return 
-
-    def setupDone(self, test=None):
-	if config.NFRBootmanager.bootmanagertimeout == '':
-            config.NFRBootmanager.bootmanagertimeout = defaultprefix
-            config.NFRBootmanager.bootmanagertimeout.save()
-            out3 = open('/media/nfr4xboot/NFR4XBootI/.timer', 'w')
-            out3.write(config.NFRBootmanager.bootmanagertimeout.value)
-            out3.close()            
-        else:
-            config.NFRBootmanager.bootmanagertimeout.save()
-            out3 = open('/media/nfr4xboot/NFR4XBootI/.timer', 'w')
-            out3.write(config.NFRBootmanager.bootmanagertimeout.value)
-            out3.close()   
-
-    def updateList(self):
-        self.list = []
-        try:
-            pluginpath = '/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot'
-            f = open(pluginpath + '/.nfr4xboot_location', 'r')
-            mypath = f.readline().strip()
-            f.close()
-        except:
-            mypath = '/media/hdd'
-
-        icon = 'dev_usb.png'
-	if 'hdd' in mypath:
-            icon = 'dev_hdd.png'
-        icon = pluginpath + '/images/' + icon
-        png = LoadPixmap(icon)
-        self['device_icon'].instance.setPixmap(png)
-        device = '/media/nfr4xboot'
-        dev_free = dev_free_space = def_free_space_percent = ''
-        rc = os.system('df > /tmp/ninfo.tmp')
-        if fileExists('/tmp/ninfo.tmp'):
-            f = open('/tmp/ninfo.tmp', 'r')
-            for line in f.readlines():
-                line = line.replace('part1', ' ')
-                parts = line.strip().split()
-                totsp = len(parts) - 1
-                if parts[totsp] == device:
-                    if totsp == 5:
-                        dev_free = parts[1]
-                        dev_free_space = parts[3]
-                        def_free_space_percent = parts[4]
-                    else:
-                        dev_free = 'N/A   '
-                        dev_free_space = parts[2]
-                        def_free_space_percent = parts[3]
-                    break
-
-            f.close()
-            os.remove('/tmp/ninfo.tmp')
-        self.availablespace = dev_free_space[0:-3]
-        perc = int(def_free_space_percent[:-1])
-        self['free_space_progressbar'].setValue(perc)
-        green = '#00389416'
-        red = '#00ff2525'
-        yellow = '#00ffe875'
-        orange = '#00ff7f50'
-        if perc < 30:
-            color = green
-        elif perc < 60:
-            color = yellow
-        elif perc < 80:
-            color = orange
-        else:
-            color = red
-        self['label6'].instance.setForegroundColor(parseColor(color))
-        self['label7'].instance.setForegroundColor(parseColor(color))
-        self['label8'].instance.setForegroundColor(parseColor(color))
-        self['label9'].instance.setForegroundColor(parseColor(color))
-        self['label11'].instance.setForegroundColor(parseColor(color))
-        self['free_space_progressbar'].instance.setForegroundColor(parseColor(color))
-        try:
-            f2 = open('/media/nfr4xboot/NFR4XBootI/.nfr4xboot', 'r')
-            mypath2 = f2.readline().strip()
-            f2.close()
-        except:
-            mypath2 = 'Flash'
-
-        if mypath2 == 'Flash':
-            image = getImageDistro()
-            if fileExists('/etc/image-version'):
-                if 'build' not in image:
-                    f = open('/etc/image-version', 'r')
-                    for line in f.readlines():
-                        if 'build=' in line:
-                            image = image + ' build ' + line[6:-1]
-                            open('/media/nfr4xboot/NFR4XBootI/.Flash', 'w').write(image)
-                            break
-
-                    f.close()
-        elif fileExists('/media/nfr4xboot/NFR4XBootI/.Flash'):
-            f = open('/media/nfr4xboot/NFR4XBootI/.Flash', 'r')
-            image = f.readline().strip()
-            f.close()
-        image = ' [' + image + ']'
-        self.list.append('Flash' + image)
-        self['label6'].setText(mypath)
-        self['label7'].setText(def_free_space_percent)
-        self['label8'].setText(dev_free_space[0:-3] + ' MB')
-        self['label9'].setText(mypath2)
-        mypath = '/media/nfr4xboot/NFR4XBootI/'
-        myimages = os.listdir(mypath)
-        for fil in myimages:
-            if os.path.isdir(os.path.join(mypath, fil)):
-                self.list.append(fil)
-
-        self['label11'].setText(str(len(self.list) - 1))
-        self['config'].setList(self.list)
-
-    def myclose(self):
-        self.close()
-
-    def myclose2(self, message):
-        self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-        self.close()
-
-    def boot(self):
-        self.mysel = self['config'].getCurrent()
-        if self.mysel:
-            out = open('/media/nfr4xboot/NFR4XBootI/.nfr4xboot', 'w')
-            out.write(self.mysel)
-            out.close()
-            os.system('rm /tmp/.nfr4xreboot')
-            message = _('Are you sure you want to Boot Image:\n') + self.mysel + ' ?'
-            ybox = self.session.openWithCallback(self.boot2, MessageBox, message, MessageBox.TYPE_YESNO)
-            ybox.setTitle(_('Boot Confirmation'))
-        else:
-            self.mysel
-
-    def boot2(self, yesno):
-        if yesno:
-            os.system('touch /tmp/.nfr4xreboot')
-            os.system('reboot -p')
-        else:
-            os.system('touch /tmp/.nfr4xreboot')
-            self.session.open(MessageBox, _('Image will be booted on the next STB boot!'), MessageBox.TYPE_INFO)
-
-    def remove(self):
-        self.mysel = self['config'].getCurrent()
-        if self.mysel:
-            f = open('/media/nfr4xboot/NFR4XBootI/.nfr4xboot', 'r')
-            mypath = f.readline().strip()
-            f.close()
-            try:
-                if mypath == self.mysel:
-                    self.session.open(MessageBox, _('Sorry you cannot delete the image, is currently booted from or select for next booting'), MessageBox.TYPE_INFO, 4)
-                if self.mysel.startswith('Flash'):
-                    self.session.open(MessageBox, _('Sorry you cannot delete Flash image'), MessageBox.TYPE_INFO, 4)
-                else:
-                    out = open('/media/nfr4xboot/NFR4XBootI/.nfr4xboot', 'w')
-                    out.write('Flash')
-                    out.close()
-                    message = _('Are you sure you want to delete Image:\n ') + self.mysel + ' ?'
-                    ybox = self.session.openWithCallback(self.remove2, MessageBox, message, MessageBox.TYPE_YESNO)
-                    ybox.setTitle(_('Delete Confirmation'))
-            except:
-                print 'no image to remove'
-
-        else:
-            self.mysel
-
-    def up(self):
-        self.list = []
-        self['config'].setList(self.list)
-        self.updateList()
-
-    def up2(self):
-        try:
-            self.list = []
-            self['config'].setList(self.list)
-            self.updateList()
-        except:
-            print ' '
-
-    def remove2(self, yesno):
-        if yesno:
-            cmd = "echo -e '\n\nNFR4XBoot deleting image..... '"
-            cmd1 = 'rm -r /media/nfr4xboot/NFR4XBootI/' + self.mysel
-            self.session.openWithCallback(self.up, Console, _('NFR4XBoot: Deleting Image'), [cmd, cmd1])
-        else:
-            self.session.open(MessageBox, _('Removing canceled!'), MessageBox.TYPE_INFO)
-
-    def installMedia(self):
-        images = False
-        myimages = os.listdir('/media/nfr4xboot/NFR4XBootUpload')
-        print myimages
-        for fil in myimages:
-            if fil.endswith('.zip'):
-                images = True
-                break
-            else:
-                images = False
-
-        if images == True:
-            self.session.openWithCallback(self.up2, NFR4XBootImageInstall)
-        else:
-            mess = _('The /media/nfr4xboot/NFR4XBootUpload directory is EMPTY!\n\nPlease upload a zip file to install')
-            self.session.open(MessageBox, mess, MessageBox.TYPE_INFO)
-
-    def install(self):
-        count = 0
-        for fn in os.listdir('/media/nfr4xboot/NFR4XBootI'):
-            dirfile = '/media/nfr4xboot/NFR4XBootI/' + fn
-            if os.path.isdir(dirfile):
-                count = count + 1
-
-        if count > 12:
-            myerror = _('Sorry you can install a max of 10 images.')
-            self.session.open(MessageBox, myerror, MessageBox.TYPE_INFO)
-        else:
-            menulist = []
-            menulist.append((_('Install from /media/nfr4xboot/NFR4XBootUpload'), 'media'))
-            menulist.append((_('Install from Internet (OpenPLi,OpenVix,OpenATV,Egami,OpenNFR,OpenHDF)'), 'internet'))
-            self.session.openWithCallback(self.menuCallback, ChoiceBox, title='Choose they way for installation', list=menulist)
-
-    def menuCallback(self, choice):
-        self.show()
-        if choice is None:
-            return
-        else:
-            if choice[1] == 'internet':
-                from Plugins.Extensions.NFR4XBoot.download_images import NFR4XChooseOnLineImage
-                self.session.open(NFR4XChooseOnLineImage)
-            if choice[1] == 'media':
-                self.installMedia()
-            return
-
-    def advanced(self):
-        menulist = []
-        menulist.append((_('Remove NFR4XBoot'), 'rmnfr4xboot'))
-        menulist.append((_('Remove all installed images'), 'rmallimg'))
-        self.session.openWithCallback(self.menuAdvancedCallback, ChoiceBox, title=_('What would You like to do ?'), list=menulist)
-
-    def menuAdvancedCallback(self, choice):
-        self.show()
-        if choice is None:
-            return
-        else:
-            if choice[1] == 'rmnfr4xboot':
-                f = file('/etc/fstab','r')
-                lines = f.readlines()
-                f.close()
-                print "lines:", lines
-                for line in lines:
-                    if "/media/nfr4xboot" in line:
-                        lines.remove(line)
-                os.system("/etc/fstab")
-                f = file('/etc/fstab','w')  
-                for l in lines:
-                    f.write(l)
-                f.close()
-                
-                cmd0 = "echo -e '\n\nNFR4XBoot preparing to remove....'"
-                cmd1 = 'rm /sbin/nfr4xinit'
-                cmd1a = "echo -e '\n\nNFR4XBoot removing boot manager....'"
-                cmd2 = 'rm /sbin/init'
-                cmd3 = 'ln -sfn /sbin/init.sysvinit /sbin/init'
-                cmd4 = 'chmod 777 /sbin/init'
-                cmd4a = "echo -e '\n\nNFR4XBoot restoring media mounts....'"
-                cmd5 = 'mv /etc/init.d/volatile-media.sh.back /etc/init.d/volatile-media.sh'
-                cmd6 = 'rm /media/nfr4xboot/NFR4XBootI/.nfr4xboot'
-                cmd7 = 'rm /media/nfr4xboot/NFR4XBootI/.Flash'
-                cmd8 = 'rm /usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location'
-                cmd8a = "echo -e '\n\nNFR4XBoot remove complete....'"
-                self.session.openWithCallback(self.close, Console, _('NFR4XBoot is removing...'), [cmd0,
-                 cmd1,
-                 cmd1a,
-                 cmd2,
-                 cmd3,
-                 cmd4,
-                 cmd4a,
-                 cmd5,
-                 cmd6,
-                 cmd7,
-                 cmd8,
-                 cmd8a])
-            if choice[1] == 'rmallimg':
-                cmd = "echo -e '\n\nNFR4XBoot deleting images..... '"
-                cmd1 = 'rm -rf /media/nfr4xboot/NFR4XBootI/*'
-                self.session.openWithCallback(self.updateList, Console, _('NFR4XBoot: Deleting All Images'), [cmd, cmd1])
-            return
-
-
-class NFR4XBootImageInstall(Screen, ConfigListScreen):
-
-    def __init__(self, session):
-        self.skin = NFR4XBootImageInstall_Skin
-        Screen.__init__(self, session)
-        fn = 'NewImage'
-        sourcelist = []
-        for fn in os.listdir('/media/nfr4xboot/NFR4XBootUpload'):
-            if fn.find('.zip') != -1:
-                fn = fn.replace('.zip', '')
-                sourcelist.append((fn, fn))
-                continue
-
-        if len(sourcelist) == 0:
-            sourcelist = [('None', 'None')]
-        self.source = ConfigSelection(choices=sourcelist)
-        self.target = ConfigText(fixed_size=False)
-        self.sett = ConfigYesNo(default=False)
-        self.zipdelete = ConfigYesNo(default=False)
-        self.bootquest = ConfigYesNo(default=True)
-        self.target.value = ''
-        self.curselimage = ''
-        try:
-            if self.curselimage != self.source.value:
-                self.target.value = self.source.value[:-13]
-                self.curselimage = self.source.value
-        except:
-            pass
-
-        self.createSetup()
-        ConfigListScreen.__init__(self, self.list, session=session)
-        self.source.addNotifier(self.typeChange)
-        self['actions'] = ActionMap(['OkCancelActions',
-         'ColorActions',
-         'CiSelectionActions',
-         'VirtualKeyboardActions'], {'cancel': self.cancel,
-         'red': self.cancel,
-         'green': self.imageInstall,
-         'yellow': self.openKeyboard}, -2)
-        self['key_green'] = Label(_('Install'))
-        self['key_red'] = Label(_('Cancel'))
-        self['key_yellow'] = Label(_('Keyboard'))
-        self['HelpWindow'] = Pixmap()
-        self['HelpWindow'].hide()
-
-    def createSetup(self):
-        self.list = []
-        self.list.append(getConfigListEntry(_('Source Image file'), self.source))
-        self.list.append(getConfigListEntry(_('Image Name'), self.target))
-        self.list.append(getConfigListEntry(_('Copy Settings to the new Image'), self.sett))
-        self.list.append(getConfigListEntry(_('Boot new Image directly?'), self.bootquest))
-        self.list.append(getConfigListEntry(_('Delete Download Imagezip after Install?'), self.zipdelete))
-
-    def typeChange(self, value):
-        self.createSetup()
-        self['config'].l.setList(self.list)
-        if self.curselimage != self.source.value:
-            self.target.value = self.source.value[:-13]
-            self.curselimage = self.source.value
-
-    def openKeyboard(self):
-        sel = self['config'].getCurrent()
-        if sel:
-            if sel == self.target:
-                if self['config'].getCurrent()[1].help_window.instance is not None:
-                    self['config'].getCurrent()[1].help_window.hide()
-            self.vkvar = sel[0]
-            if self.vkvar == _('Image Name'):
-                self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
-        return
-
-    def VirtualKeyBoardCallback(self, callback = None):
-        if callback is not None and len(callback):
-            self['config'].getCurrent()[1].setValue(callback)
-            self['config'].invalidate(self['config'].getCurrent())
-        return
-
-    def imageInstall(self):
-        if self.check_free_space():
-            pluginpath = '/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot'
-            myerror = ''
-            source = self.source.value.replace(' ', '')
-            target = self.target.value.replace(' ', '')
-            for fn in os.listdir('/media/nfr4xboot/NFR4XBootI'):
-                if fn == target:
-                    myerror = _('Sorry, an Image with the name ') + target + _(' is already installed.\n Please try another name.')
-                    continue
-
-            if source == 'None':
-                myerror = _('You have to select one Image to install.\nPlease, upload your zip file in the folder: /media/nfr4xboot/NFR4XBootUpload and select the image to install.')
-            if target == '':
-                myerror = _('You have to provide a name for the new Image.')
-            if target == 'Flash':
-                myerror = _('Sorry this name is reserved. Choose another name for the new Image.')
-            if len(target) > 35:
-                myerror = _('Sorry the name of the new Image is too long.')
-            if myerror:
-                myerror
-                self.session.open(MessageBox, myerror, MessageBox.TYPE_INFO)
-            else:
-                myerror
-                message = "echo -e '\n\n"
-                message += _('NFR4XBoot will install the new image.\n\n')
-                message += _('Please: DO NOT reboot your STB and turn off the power.\n\n')
-                message += _('The new image will be installed and auto booted in few minutes.\n\n')
-                message += "'"
-                if fileExists(pluginpath + '/ex_init.py'):
-                    cmd1 = 'python ' + pluginpath + '/ex_init.py'
-                else:
-                    cmd1 = 'python ' + pluginpath + '/ex_init.pyo'
-                cmd = '%s %s %s %s %s %s %s %s %s' % (cmd1,
-                 source,
-                 target.replace(' ', '.'),
-                 str(self.sett.value),
-                 str(self.bootquest.value),
-                 str(self.zipdelete.value),
-                 getImageFolder(),
-                 getMachineRootFile(),
-                 getImageArch())						   
-                print '[NFR4X-BOOT]: ', cmd
-                self.session.open(Console, _('NFR4XBoot: Install new image'), [message, cmd])
-
-    def check_free_space(self):
-        if Freespace('/media/nfr4xboot/NFR4XBootUpload') < 300000:
-            self.session.open(MessageBox, _('Not enough free space on /media/nfr4xboot/ !!\nYou need at least 300Mb free space.\n\nExit plugin.'), type=MessageBox.TYPE_ERROR)
-            return False
-        return True
-
-    def cancel(self):
-        self.close()
-
-def checkkernel():
-    mycheck = 0
-    if not fileExists('/media/usb'):
-        os.system('mkdir /media/usb')
-    if getBoxType() in ('iqonios300hd', 'starsatlx'): 
-        mycheck = 2
-    else:
-        mycheck = 1
-    return mycheck
-
-def main(session, **kwargs):
-    m = checkkernel()
-    if m == 1:
-        try:
-            f = open('/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location', 'r')
-            mypath = f.readline().strip()
-            f.close()
-            if not fileExists('/media/nfr4xboot'):
-                os.mkdir('/media/nfr4xboot')
-            cmd = 'mount ' + mypath + ' /media/nfr4xboot'
-            os.system(cmd)
-            f = open('/proc/mounts', 'r')
-            for line in f.readlines():
-                if line.find('/media/nfr4xboot') != -1:
-                    line = line[0:9]
-                    break
-
-            cmd = 'mount ' + line + ' ' + mypath
-            os.system(cmd)
-            cmd = 'mount ' + mypath + ' /media/nfr4xboot'
-            os.system(cmd)
-        except:
-            pass
-
-        if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location'):
-            if fileExists('/media/nfr4xboot/NFR4XBootI/.nfr4xboot'):
-                session.open(NFR4XBootImageChoose)
-            else:
-                session.open(NFR4XBootInstallation)
-        else:
-            session.open(NFR4XBootInstallation)
-    elif m == 2:
-        session.open(MessageBox, _('Sorry: NFR4XBoot no work by this Box!'), MessageBox.TYPE_INFO, 3)
-    else:
-        session.open(MessageBox, _('Sorry: Wrong image in flash found. You have to install in flash NFR Image'), MessageBox.TYPE_INFO, 3)
-
-
-def menu(menuid, **kwargs):
-    filename = '/etc/videomode2'
-    if os.path.exists(filename):
-        pass
-    else: 
-        f = open(filename, 'w')
-        f.write("576i")
-        f.close()
-    m = checkkernel()
-    if m == 1:
-        if menuid == 'mainmenu':
-            return [(_('NFR4X MultiBoot'),
-              main,
-              'nfr4x_boot',
-              1)]
-        return []
-    else:
-        return []
-
-
+from Components.Label import Label
+from Components.MenuList import MenuList
+from Components.Pixmap import Pixmap
+from Components.Sources.List import List
+from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
+from Screens.SkinSelector import SkinSelector
+from Screens.VirtualKeyBoard import VirtualKeyBoard
+from Screens.InputBox import InputBox
+from Screens.MessageBox import MessageBox
+from Screens.Screen import Screen
+from Screens.Standby import TryQuitMainloop
+from Tools.Directories import *
+from Tools.LoadPixmap import LoadPixmap
+from Tools.WeatherID import get_woeid_from_yahoo
+from Tools import Notifications
+from os import listdir, remove, rename, system, path, symlink, chdir, makedirs
+from Components.AVSwitch import AVSwitch
+import shutil
+import glob
 
-def Plugins(**kwargs):
-    return [PluginDescriptor(name='NFR4XBoot', description='NFR4X MultiBoot', where=PluginDescriptor.WHERE_MENU, fnc=menu), PluginDescriptor(name='NFR4XBoot', description=_('E2 Light Multiboot'), icon='NFR4XBootFHD.png', where=PluginDescriptor.WHERE_PLUGINMENU, fnc=main)] 
+from __init__ import _
+
+
+cur_skin = config.skin.primary_skin.value.replace('/skin.xml', '')
+if cur_skin == "skin.xml":
+        cur_skin = "skin_default"
+
+# Atile
+config.plugins.NfrHD = ConfigSubsection()
+config.plugins.NfrHD.refreshInterval = ConfigNumber(default=10)
+config.plugins.NfrHD.woeid = ConfigNumber(default = 638242)
+config.plugins.NfrHD.tempUnit = ConfigSelection(default="Celsius", choices = [
+				("Celsius", _("Celsius")),
+				("Fahrenheit", _("Fahrenheit"))
+				])
+
+def isInteger(s):
+	try: 
+		int(s)
+		return True
+	except ValueError:
+		return False
+
+class WeatherLocationChoiceList(Screen):
+	skin = """
+		<screen name="WeatherLocationChoiceList" position="center,center" size="1280,720" title="Location list" >
+			<widget source="Title" render="Label" position="70,47" size="950,43" font="Regular;35" transparent="1" />
+			<widget name="choicelist" position="70,115" size="700,480" scrollbarMode="showOnDemand" scrollbarWidth="6" transparent="1" />
+			<eLabel position=" 55,675" size="290, 5" zPosition="-10" backgroundColor="red" />
+			<eLabel position="350,675" size="290, 5" zPosition="-10" backgroundColor="green" />
+			<eLabel position="645,675" size="290, 5" zPosition="-10" backgroundColor="yellow" />
+			<eLabel position="940,675" size="290, 5" zPosition="-10" backgroundColor="blue" />
+			<widget name="key_red" position="70,635" size="260,25" zPosition="1" font="Regular;20" halign="left" foregroundColor="foreground" transparent="1" />
+			<widget name="key_green" position="365,635" size="260,25" zPosition="1" font="Regular;20" halign="left" foregroundColor="foreground" transparent="1" />
+		</screen>
+		"""
+
+	def __init__(self, session, location_list):
+		self.session = session
+		self.location_list = location_list
+		list = []
+		Screen.__init__(self, session)
+		self.title = _("Location list")
+		self["choicelist"] = MenuList(list)
+		self["key_red"] = Label(_("Cancel"))
+		self["key_green"] = Label(_("OK"))
+		self["myActionMap"] = ActionMap(["SetupActions", "ColorActions"],
+		{
+			"ok": self.keyOk,
+			"green": self.keyOk,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel,
+		}, -1)
+		self.createChoiceList()
+
+	def createChoiceList(self):
+		list = []
+		for x in self.location_list:
+			list.append((str(x[1]), str(x[0])))
+		self["choicelist"].l.setList(list)
+
+	def keyOk(self):
+		returnValue = self["choicelist"].l.getCurrentSelection()[1]
+		if returnValue is not None:
+			self.close(returnValue)
+		else:
+			self.keyCancel()
+
+	def keyCancel(self):
+		self.close(None)
+
+
+class NfrHD_Config(Screen, ConfigListScreen):
+
+	skin = """
+		<screen name="NfrHD_Config" position="center,center" size="1280,720" title="NfrHD Setup" >
+			<widget source="Title" render="Label" position="70,47" size="950,43" font="Regular;35" transparent="1" />
+			<widget name="config" position="70,115" size="700,480" scrollbarMode="showOnDemand" scrollbarWidth="6" transparent="1" />
+			<widget name="Picture" position="808,342" size="400,225" alphatest="on" />
+			<eLabel position=" 55,675" size="290, 5" zPosition="-10" backgroundColor="red" />
+			<eLabel position="350,675" size="290, 5" zPosition="-10" backgroundColor="green" />
+			<eLabel position="645,675" size="290, 5" zPosition="-10" backgroundColor="yellow" />
+			<eLabel position="940,675" size="290, 5" zPosition="-10" backgroundColor="blue" />
+			<widget name="key_red" position="70,635" size="260,25" zPosition="1" font="Regular;20" halign="left" foregroundColor="foreground" transparent="1" />
+			<widget name="key_green" position="365,635" size="260,25" zPosition="1" font="Regular;20" halign="left" foregroundColor="foreground" transparent="1" />
+			<widget name="key_yellow" position="660,635" size="260,25" zPosition="1" font="Regular;20" halign="left" foregroundColor="foreground" transparent="1" />
+			<widget name="key_blue" position="955,635" size="260,25" zPosition="0" font="Regular;20" halign="left" foregroundColor="foreground" transparent="1" />
+		</screen>
+	"""
+
+	def __init__(self, session, args = 0):
+		self.session = session
+		self.skin_lines = []
+		self.changed_screens = False
+		Screen.__init__(self, session)
+                global cur_skin
+                global color_test
+                global font_test
+                global infobar_test
+                global sib_test
+                global ch_se_test                
+                global ev_test                
+		color_test = True
+		font_test = True
+		infobar_test = True
+		sib_test = True
+		ch_se_test = True
+		ev_test = True		
+                self.skin_base_dir = "/usr/share/enigma2/%s/" % cur_skin
+                if glob.glob(self.skin_base_dir + 'colors_*') == True:
+                        color_test = False                
+                if glob.glob(self.skin_base_dir + 'font_*') == True:
+                	font_test = False                
+                if glob.glob(self.skin_base_dir + 'infobar_*') == True:
+                	infobar_test = False                
+                if glob.glob(self.skin_base_dir + 'sib_*') == True:			
+			sib_test = False
+                if glob.glob(self.skin_base_dir + 'ch_se_*') == True:			
+			ch_se_test = False                            
+                if glob.glob(self.skin_base_dir + 'ev_*') == True:			
+			ev_test = False                                            
+                		
+		self.start_skin = config.skin.primary_skin.value
+		self.Scale = AVSwitch().getFramebufferScale()
+		self.PicLoad = ePicLoad()
+		self['Preview'] = Pixmap()
+	        self.getInitConfig()
+		self.list = []
+		ConfigListScreen.__init__(self, self.list, session = self.session, on_change = self.changedEntry)
+
+		self["key_red"] = Label(_("Cancel"))
+		self["key_green"] = Label(_("OK"))
+		self["key_yellow"] = Label()
+		self["key_blue"] = Label(_("About"))
+		self["setupActions"] = ActionMap(["SetupActions", "ColorActions"],
+			{
+				"green": self.keyGreen,
+				"red": self.cancel,
+				"yellow": self.keyYellow,
+				"blue": self.about,
+				"cancel": self.cancel,
+				"ok": self.keyOk,
+			}, -2)
+			
+		self["Picture"] = Pixmap()
+		
+		if not self.selectionChanged in self["config"].onSelectionChanged:
+			self["config"].onSelectionChanged.append(self.selectionChanged)
+		self.createConfigList()
+
+	def getInitConfig(self):
+		self.title = _("%s - Setup") % cur_skin
+		self.skin_base_dir = "/usr/share/enigma2/%s/" % cur_skin
+		self.default_font_file = "font_Original.xml"
+		self.default_color_file = "colors_Original.xml"
+		self.default_infobar_file = "infobar_Original.xml"
+		self.default_sib_file = "sib_Original.xml"
+		self.default_ch_se_file = "ch_se_Original.xml"		
+		self.default_ev_file = "ev_Original.xml"		
+		self.color_file = "skin_user_colors.xml"
+		self.font_file = "skin_user_header.xml"
+		self.infobar_file = "skin_user_infobar.xml"
+		self.sib_file = "skin_user_sib.xml"
+		self.ch_se_file = "skin_user_ch_se.xml"
+		self.ev_file = "skin_user_ev.xml"		
+                if color_test == True:
+			current_color = self.getCurrentColor()
+			color_choices = self.getPossibleColor()
+			default_color = ("default")
+			config.myNfrHD_style = ConfigSelection(default=default_color, choices = color_choices)
+			if current_color is None:
+				current_color = default_color
+			if default_color not in color_choices:
+				color_choices.append(default_color)
+			current_color = current_color
+                if font_test == True:
+			current_font = self.getCurrentFont() 
+			font_choices = self.getPossibleFont()
+			default_font = ("default")
+			config.myNfrHD_font = ConfigSelection(default=default_font, choices = font_choices)		
+			if current_font is None:
+				current_font = default_font
+			if default_font not in font_choices:
+				font_choices.append(default_font)
+			current_font = current_font
+		if infobar_test == True:
+			current_infobar = self.getCurrentInfobar()
+			infobar_choices = self.getPossibleInfobar()
+			default_infobar = ("default")
+			config.myNfrHD_infobar = ConfigSelection(default=default_infobar, choices = infobar_choices)		
+			if current_infobar is None:
+				current_infobar = default_infobar
+			if default_infobar not in infobar_choices:
+				infobar_choices.append(default_infobar)
+			current_infobar = current_infobar
+		if sib_test == True:
+                        current_sib = self.getCurrentSib() 
+			sib_choices = self.getPossibleSib()
+			default_sib = ("default")
+			config.myNfrHD_sib = ConfigSelection(default=default_sib, choices = sib_choices)		
+			if current_sib is None:
+				current_sib = default_sib
+			if default_sib not in sib_choices:
+				sib_choices.append(default_sib)
+			current_sib = current_sib
+		if ch_se_test == True:
+                        current_ch_se = self.getCurrentCh_se() 
+			ch_se_choices = self.getPossibleCh_se()
+			default_ch_se = ("default")
+			config.myNfrHD_ch_se = ConfigSelection(default=default_ch_se, choices = ch_se_choices)		
+			if current_ch_se is None:
+				current_ch_se = default_ch_se
+			if default_ch_se not in ch_se_choices:
+				ch_se_choices.append(default_ch_se)
+			current_ch_se = current_ch_se			
+		if ev_test == True:
+                        current_ev = self.getCurrentEV() 
+			ev_choices = self.getPossibleEV()
+			default_ev = ("default")
+			config.myNfrHD_ev = ConfigSelection(default=default_ev, choices = ev_choices)		
+			if current_ev is None:
+				current_ev = default_ev
+			if default_ev not in ev_choices:
+				ev_choices.append(default_ev)
+			current_ev = current_ev			
+		
+		myatile_active = self.getmyAtileState()
+		config.myNfrHD_active = ConfigYesNo(default=myatile_active)
+		#choices = self.getPossibleFont()
+		self.myNfrHD_fake_entry = ConfigNothing()		
+
+	def createConfigList(self):
+		self.set_myatile = getConfigListEntry(_("Enable %s pro:") % cur_skin, config.myNfrHD_active)
+		self.set_new_skin = getConfigListEntry(_("Change skin"), ConfigNothing())
+		self.find_woeid = getConfigListEntry(_("Search weather location ID"), ConfigNothing())
+		self.list = []
+		self.list.append(self.set_myatile)
+		if color_test == True:
+                	self.set_color = getConfigListEntry(_("Style:"), config.myNfrHD_style)	
+			self.list.append(self.set_color)
+		if font_test == True:
+                	self.set_font = getConfigListEntry(_("Font:"), config.myNfrHD_font)	
+			self.list.append(self.set_font)
+		if infobar_test == True:
+                	self.set_infobar = getConfigListEntry(_("Infobar:"), config.myNfrHD_infobar)	
+			self.list.append(self.set_infobar)
+		if sib_test == True:
+		        self.set_sib = getConfigListEntry(_("Secondinfobar:"), config.myNfrHD_sib)
+			self.list.append(self.set_sib)
+		if ch_se_test == True:
+		        self.set_ch_se = getConfigListEntry(_("Channelselection:"), config.myNfrHD_ch_se)
+			self.list.append(self.set_ch_se)			
+		if ev_test == True:
+		        self.set_ev = getConfigListEntry(_("Eventview:"), config.myNfrHD_ev)
+			self.list.append(self.set_ev)			
+		self.list.append(self.set_new_skin)
+		self.list.append(getConfigListEntry(_("---Weather---"), self.myNfrHD_fake_entry))
+		self.list.append(getConfigListEntry(_("Refresh interval in minutes:"), config.plugins.NfrHD.refreshInterval))
+		self.list.append(getConfigListEntry(_("Temperature unit:"), config.plugins.NfrHD.tempUnit))
+		self.list.append(self.find_woeid)
+		self.list.append(getConfigListEntry(_("Location # (http://weather.yahoo.com/):"), config.plugins.NfrHD.woeid))
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+		if config.myNfrHD_active.value:
+		        if cur_skin == "skin_default":
+			        self["key_yellow"].setText("skin_default Pro")
+			else:
+                                self["key_yellow"].setText("%s Pro" % cur_skin)
+		else:
+			self["key_yellow"].setText("")
+
+	def changedEntry(self):
+		if color_test == True:
+                	if self["config"].getCurrent() == self.set_color:
+				self.setPicture(config.myNfrHD_style.value)
+		if font_test == True:		
+			if self["config"].getCurrent() == self.set_font:
+				self.setPicture(config.myNfrHD_font.value)
+		if infobar_test == True:		
+			if self["config"].getCurrent() == self.set_infobar:
+				self.setPicture(config.myNfrHD_infobar.value)
+		if sib_test == True:		
+			if self["config"].getCurrent() == self.set_sib:
+				self.setPicture(config.myNfrHD_sib.value)
+		if ch_se_test == True:		
+			if self["config"].getCurrent() == self.set_ch_se:
+				self.setPicture(config.myNfrHD_ch_se.value)				
+		if ev_test == True:		
+			if self["config"].getCurrent() == self.set_ev:
+				self.setPicture(config.myNfrHD_ev.value)				
+		if self["config"].getCurrent() == self.set_myatile:
+			if config.myNfrHD_active.value:
+		        	if cur_skin == "skin_default":
+			        	self["key_yellow"].setText("skin_default Pro")
+				else:
+                                	self["key_yellow"].setText("%s Pro" % cur_skin)
+			else:
+				self["key_yellow"].setText("")
+
+	def selectionChanged(self):
+		if color_test == True:	
+			if self["config"].getCurrent() == self.set_color:
+				self.setPicture(config.myNfrHD_style.value)
+		if font_test == True:		
+			if self["config"].getCurrent() == self.set_font:
+				self.setPicture(config.myNfrHD_font.value)
+		if infobar_test == True:		
+			if self["config"].getCurrent() == self.set_infobar:
+				self.setPicture(config.myNfrHD_infobar.value)
+		if sib_test == True:		
+			if self["config"].getCurrent() == self.set_sib:
+				self.setPicture(config.myNfrHD_sib.value)
+		if ch_se_test == True:		
+			if self["config"].getCurrent() == self.set_ch_se:
+				self.setPicture(config.myNfrHD_ch_se.value)
+		if ev_test == True:		
+			if self["config"].getCurrent() == self.set_ev:
+				self.setPicture(config.myNfrHD_ev.value)
+		else:
+			self["Picture"].hide()
+
+	def cancel(self):
+		if self["config"].isChanged():
+			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"), MessageBox.TYPE_YESNO, default = False)
+		else:
+			for x in self["config"].list:
+				x[1].cancel()
+			if self.changed_screens:
+				self.restartGUI()
+			else:
+				self.close()
+
+	def cancelConfirm(self, result):
+		if result is None or result is False:
+			print "[%s]: Cancel confirmed." % cur_skin
+		else:
+			print "[%s]: Cancel confirmed. Config changes will be lost." % cur_skin
+			for x in self["config"].list:
+				x[1].cancel()
+			self.close()
+
+	def getPossibleColor(self):
+		color_list = []
+		for f in sorted(listdir(self.skin_base_dir), key=str.lower):
+			search_str = 'colors_'
+			if f.endswith('.xml') and f.startswith(search_str):
+				friendly_name = f.replace(search_str, "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				color_list.append(f)
+		color_list.append("default")
+                return color_list
+
+	def getPossibleFont(self):
+		font_list = []
+		for f in sorted(listdir(self.skin_base_dir), key=str.lower):
+			search_str = 'font_'
+			if f.endswith('.xml') and f.startswith(search_str):
+				friendly_name = f.replace(search_str, "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				font_list.append(f)
+		font_list.append("default")
+                return font_list
+		
+	def getPossibleInfobar(self):
+		infobar_list = []
+		for f in sorted(listdir(self.skin_base_dir), key=str.lower):
+			search_str = 'infobar_'
+			if f.endswith('.xml') and f.startswith(search_str):
+				friendly_name = f.replace(search_str, "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				infobar_list.append(f)
+		infobar_list.append("default")
+                return infobar_list
+
+	def getPossibleSib(self):
+		sib_list = []
+		for f in sorted(listdir(self.skin_base_dir), key=str.lower):
+			search_str = 'sib_'
+			if f.endswith('.xml') and f.startswith(search_str):
+				friendly_name = f.replace(search_str, "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				sib_list.append(f)
+		sib_list.append("default")
+                return sib_list
+                
+	def getPossibleCh_se(self):
+		ch_se_list = []
+		for f in sorted(listdir(self.skin_base_dir), key=str.lower):
+			search_str = 'ch_se_'
+			if f.endswith('.xml') and f.startswith(search_str):
+				friendly_name = f.replace(search_str, "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				ch_se_list.append(f)
+		ch_se_list.append("default")
+                return ch_se_list                
+                
+	def getPossibleEV(self):
+		ev_list = []
+		for f in sorted(listdir(self.skin_base_dir), key=str.lower):
+			search_str = 'ev_'
+			if f.endswith('.xml') and f.startswith(search_str):
+				friendly_name = f.replace(search_str, "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				ev_list.append(f)
+		ev_list.append("default")
+                return ev_list
+                
+	def getmyAtileState(self):
+		chdir(self.skin_base_dir)
+		if path.exists("mySkin"):
+			return True
+		else:
+			return False
+
+	def getCurrentColor(self):
+		myfile = self.skin_base_dir + self.color_file
+		if not path.exists(myfile):
+			if path.exists(self.skin_base_dir + self.default_color_file):
+				if path.islink(myfile):
+					remove(myfile)
+				chdir(self.skin_base_dir)
+				symlink(self.default_color_file, self.color_file)
+			else:
+				return None
+		filename = path.realpath(myfile)
+		filename = path.basename(filename)
+		search_str = 'colors_'
+		friendly_name = filename.replace(search_str, "")
+		friendly_name = friendly_name.replace(".xml", "")
+		friendly_name = friendly_name.replace("_", " ")
+		return (filename)
+
+	def getCurrentFont(self):
+		myfile = self.skin_base_dir + self.font_file
+		if not path.exists(myfile):
+			if path.exists(self.skin_base_dir + self.default_font_file):
+				if path.islink(myfile):
+					remove(myfile)
+				chdir(self.skin_base_dir)
+				symlink(self.default_font_file, self.font_file)
+			else:
+				return None
+		filename = path.realpath(myfile)
+		filename = path.basename(filename)
+		search_str = 'font_'
+		friendly_name = filename.replace(search_str, "")
+		friendly_name = friendly_name.replace(".xml", "")
+		friendly_name = friendly_name.replace("_", " ")
+		return (filename)
+		
+	def getCurrentInfobar(self):
+		myfile = self.skin_base_dir + self.infobar_file
+		if not path.exists(myfile):
+			if path.exists(self.skin_base_dir + self.default_infobar_file):
+				if path.islink(myfile):
+					remove(myfile)
+				chdir(self.skin_base_dir)
+				symlink(self.default_infobar_file, self.infobar_file)
+			else:
+				return None
+		filename = path.realpath(myfile)
+		filename = path.basename(filename)
+		search_str = 'infobar_'
+		friendly_name = filename.replace(search_str, "")
+		friendly_name = friendly_name.replace(".xml", "")
+		friendly_name = friendly_name.replace("_", " ")
+		return (filename)
+
+	def getCurrentSib(self):
+		myfile = self.skin_base_dir + self.sib_file
+		if not path.exists(myfile):
+			if path.exists(self.skin_base_dir + self.default_sib_file):
+				if path.islink(myfile):
+					remove(myfile)
+				chdir(self.skin_base_dir)
+				symlink(self.default_sib_file, self.sib_file)
+			else:
+				return None
+		filename = path.realpath(myfile)
+		filename = path.basename(filename)
+		search_str = 'sib_'
+		friendly_name = filename.replace(search_str, "")
+		friendly_name = friendly_name.replace(".xml", "")
+		friendly_name = friendly_name.replace("_", " ")
+		return (filename)
+		
+	def getCurrentCh_se(self):
+		myfile = self.skin_base_dir + self.ch_se_file
+		if not path.exists(myfile):
+			if path.exists(self.skin_base_dir + self.default_ch_se_file):
+				if path.islink(myfile):
+					remove(myfile)
+				chdir(self.skin_base_dir)
+				symlink(self.default_ch_se_file, self.ch_se_file)
+			else:
+				return None
+		filename = path.realpath(myfile)
+		filename = path.basename(filename)
+		search_str = 'ch_se_'
+		friendly_name = filename.replace(search_str, "")
+		friendly_name = friendly_name.replace(".xml", "")
+		friendly_name = friendly_name.replace("_", " ")
+		return (filename)
+                
+	def getCurrentEV(self):
+		myfile = self.skin_base_dir + self.ev_file
+		if not path.exists(myfile):
+			if path.exists(self.skin_base_dir + self.default_ev_file):
+				if path.islink(myfile):
+					remove(myfile)
+				chdir(self.skin_base_dir)
+				symlink(self.default_ev_file, self.ev_file)
+			else:
+				return None
+		filename = path.realpath(myfile)
+		filename = path.basename(filename)
+		search_str = 'ev_'
+		friendly_name = filename.replace(search_str, "")
+		friendly_name = friendly_name.replace(".xml", "")
+		friendly_name = friendly_name.replace("_", " ")
+		return (filename)                		
+
+	def setPicture(self, f):
+                try:
+                        pic = f.replace(".xml", ".png")
+                except:
+                        pic = "default.png"                        
+		preview = self.skin_base_dir + "preview/preview_" + pic
+		if path.exists(preview):
+			self["Picture"].instance.setPixmapFromFile(preview)
+			self["Picture"].show()
+		else:
+			self["Picture"].hide()
+
+	def keyYellow(self):
+		if config.myNfrHD_active.value:
+			self.session.openWithCallback(self.NfrHDScreenCB, NfrHDScreens)
+		else:
+			self["config"].setCurrentIndex(0)
+
+	def keyOk(self):
+		sel =  self["config"].getCurrent()
+		if sel is not None and sel == self.set_new_skin:
+			self.openSkinSelector()
+		elif sel is not None and sel == self.find_woeid:
+			self.session.openWithCallback(self.search_weather_id_callback, VirtualKeyBoard, title = _('Please enter search string for your location'), text = "")
+		else:
+			self.keyGreen()
+
+	def openSkinSelector(self):
+		self.session.openWithCallback(self.skinChanged, SkinSelector)
+
+
+	def openSkinSelectorDelayed(self):
+		self.delaytimer = eTimer()
+		self.delaytimer.callback.append(self.openSkinSelector)
+		self.delaytimer.start(200, True)
+
+	def search_weather_id_callback(self, res):
+		if res:
+			id_dic = get_woeid_from_yahoo(res)
+			if id_dic.has_key('error'):
+				error_txt = id_dic['error']
+				self.session.open(MessageBox, _("Sorry, there was a problem:") + "\n%s" % error_txt, MessageBox.TYPE_ERROR)
+			elif id_dic.has_key('count'):
+				result_no = int(id_dic['count'])
+				location_list = []
+				for i in range(0, result_no):
+					location_list.append(id_dic[i])
+				self.session.openWithCallback(self.select_weather_id_callback, WeatherLocationChoiceList, location_list)
+
+	def select_weather_id_callback(self, res):
+		if res and isInteger(res):
+			config.plugins.NfrHD.woeid.value = int(res)
+
+	def skinChanged(self, ret = None):
+		global cur_skin
+		cur_skin = config.skin.primary_skin.value.replace('/skin.xml', '')
+		if cur_skin == "skin.xml":
+        		cur_skin = "skin_default"
+		else:
+			self.getInitConfig()
+			self.createConfigList()
+
+	def keyGreen(self):
+		if self["config"].isChanged():
+			for x in self["config"].list:
+				x[1].save()
+			chdir(self.skin_base_dir)
+			if path.exists(self.font_file):
+				remove(self.font_file)
+			elif path.islink(self.font_file):
+				remove(self.font_file)
+			if config.myNfrHD_font.value != 'default':
+				symlink(config.myNfrHD_font.value, self.font_file)
+			if path.exists(self.color_file):
+				remove(self.color_file)
+			elif path.islink(self.color_file):
+				remove(self.color_file)
+			if config.myNfrHD_style.value != 'default':
+				symlink(config.myNfrHD_style.value, self.color_file)
+			if path.exists(self.infobar_file):
+				remove(self.infobar_file)
+			elif path.islink(self.infobar_file):
+				remove(self.infobar_file)
+			if config.myNfrHD_infobar.value != 'default':
+				symlink(config.myNfrHD_infobar.value, self.infobar_file)
+			if path.exists(self.sib_file):
+				remove(self.sib_file)
+			elif path.islink(self.sib_file):
+				remove(self.sib_file)
+			if config.myNfrHD_sib.value != 'default':
+				symlink(config.myNfrHD_sib.value, self.sib_file)
+			if path.exists(self.ch_se_file):
+				remove(self.ch_se_file)
+			elif path.islink(self.ch_se_file):
+				remove(self.ch_se_file)
+			if config.myNfrHD_ch_se.value != 'default':
+				symlink(config.myNfrHD_ch_se.value, self.ch_se_file)
+			if path.exists(self.ev_file):
+				remove(self.ev_file)
+			elif path.islink(self.ev_file):
+				remove(self.ev_file)
+			if config.myNfrHD_ev.value != 'default':
+				symlink(config.myNfrHD_ev.value, self.ev_file)                                                                		
+                        config.myNfrHD_font.save()
+                        config.myNfrHD_style.save()
+                        config.myNfrHD_infobar.save()
+                        config.myNfrHD_sib.save()
+                        config.myNfrHD_ch_se.save()
+                        config.myNfrHD_ev.save()
+                        configfile.save()
+                        
+                        if config.myNfrHD_active.value:
+				if not path.exists("mySkin") and path.exists("mySkin_off"):
+					symlink("mySkin_off","mySkin")
+			else:
+				if path.exists("mySkin"):
+					if path.exists("mySkin_off"):
+						if path.islink("mySkin"):
+							remove("mySkin")
+						else:
+							shutil.rmtree("mySkin")
+					else:
+						rename("mySkin", "mySkin_off")
+			self.restartGUI()
+		elif  config.skin.primary_skin.value != self.start_skin:
+			self.restartGUI()
+		else:
+			if self.changed_screens:
+				self.restartGUI()
+			else:
+				self.close()
+
+	def NfrHDScreenCB(self):
+		self.changed_screens = True
+		self["config"].setCurrentIndex(0)
+
+	def restartGUI(self):
+		restartbox = self.session.openWithCallback(self.restartGUIcb,MessageBox,_("Restart necessary, restart GUI now?"), MessageBox.TYPE_YESNO)
+		restartbox.setTitle(_("Message"))
+
+	def about(self):
+		self.session.open(NfrHD_About)
+
+	def restartGUIcb(self, answer):
+		if answer is True:
+			self.session.open(TryQuitMainloop, 3)
+		else:
+			self.close()
+
+class NfrHD_About(Screen):
+
+	def __init__(self, session, args = 0):
+		self.session = session
+		Screen.__init__(self, session)
+		self["setupActions"] = ActionMap(["SetupActions", "ColorActions"],
+			{
+				"cancel": self.cancel,
+				"ok": self.keyOk,
+			}, -2)
+
+	def keyOk(self):
+		self.close()
+
+	def cancel(self):
+		self.close()
+
+class NfrHDScreens(Screen):
+
+	skin = """
+		<screen name="NfrHDScreens" position="center,center" size="1280,720" title="NfrHD Setup">
+			<widget source="Title" render="Label" position="70,47" size="950,43" font="Regular;35" transparent="1" />
+			<widget source="menu" render="Listbox" position="70,115" size="700,480" scrollbarMode="showOnDemand" scrollbarWidth="6" scrollbarSliderBorderWidth="1" enableWrapAround="1" transparent="1">
+				<convert type="TemplatedMultiContent">
+					{"template":
+						[
+							MultiContentEntryPixmapAlphaTest(pos = (2, 2), size = (25, 24), png = 2),
+							MultiContentEntryText(pos = (35, 4), size = (500, 24), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1),
+						],
+						"fonts": [gFont("Regular", 22),gFont("Regular", 16)],
+						"itemHeight": 30
+					}
+				</convert>
+			</widget>
+			<widget name="Picture" position="808,342" size="400,225" alphatest="on" />
+			<eLabel position=" 55,675" size="290, 5" zPosition="-10" backgroundColor="red" />
+			<eLabel position="350,675" size="290, 5" zPosition="-10" backgroundColor="green" />
+			<widget source="key_red" render="Label" position="70,635" size="260,25" zPosition="1" font="Regular;20" halign="left" transparent="1" />
+			<widget source="key_green" render="Label" position="365,635" size="260,25" zPosition="1" font="Regular;20" halign="left" transparent="1" />
+		</screen>
+	"""
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.session = session
+		
+		global cur_skin
+		if cur_skin == "skin_default":
+			self.title = _("skin_default additional screens")
+		else:
+                        self.title = _("%s additional screens") % cur_skin		
+		
+		try:
+			self["title"]=StaticText(self.title)
+		except:
+			print 'self["title"] was not found in skin'
+		
+		self["key_red"] = StaticText(_("Exit"))
+		self["key_green"] = StaticText(_("on"))
+		
+		self["Picture"] = Pixmap()
+		
+		menu_list = []
+		self["menu"] = List(menu_list)
+		
+		self["shortcuts"] = ActionMap(["SetupActions", "ColorActions", "DirectionActions"],
+		{
+			"ok": self.runMenuEntry,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel,
+			"green": self.runMenuEntry,
+		}, -2)
+		
+		if cur_skin == "skin_default":
+		        self.skin_base_dir = "/usr/share/enigma2/%s/" % cur_skin
+                else:
+                	self.skin_base_dir = "/usr/share/enigma2/%s/" % cur_skin
+		self.screen_dir = "allScreens"
+		self.file_dir = "mySkin_off"
+		my_path = resolveFilename(SCOPE_SKIN, "%s/icons/input_info.png" % cur_skin)
+		if not path.exists(my_path):
+			my_path = resolveFilename(SCOPE_SKIN, "skin_default/icons/lock_on.png")
+		self.enabled_pic = LoadPixmap(cached = True, path = my_path)
+		my_path = resolveFilename(SCOPE_SKIN, "%s/icons/input_error.png" % cur_skin)
+		if not path.exists(my_path):
+			my_path = resolveFilename(SCOPE_SKIN, "skin_default/icons/lock_off.png")
+		self.disabled_pic = LoadPixmap(cached = True, path = my_path)
+		
+		if not self.selectionChanged in self["menu"].onSelectionChanged:
+			self["menu"].onSelectionChanged.append(self.selectionChanged)
+		
+		self.onLayoutFinish.append(self.createMenuList)
+
+	def selectionChanged(self):
+		sel = self["menu"].getCurrent()
+		if sel is not None:
+			self.setPicture(sel[0])
+			if sel[2] == self.enabled_pic:
+				self["key_green"].setText(_("off"))
+			elif sel[2] == self.disabled_pic:
+				self["key_green"].setText(_("on"))
+
+	def createMenuList(self):
+		chdir(self.skin_base_dir)
+		f_list = []
+		dir_path = self.skin_base_dir + self.screen_dir
+		if not path.exists(dir_path):
+			makedirs(dir_path)
+		file_dir_path = self.skin_base_dir + self.file_dir
+		if not path.exists(file_dir_path):
+			makedirs(file_dir_path)
+		list_dir = sorted(listdir(dir_path), key=str.lower)
+		for f in list_dir:
+			if f.endswith('.xml') and f.startswith('skin_'):
+				friendly_name = f.replace("skin_", "")
+				friendly_name = friendly_name.replace(".xml", "")
+				friendly_name = friendly_name.replace("_", " ")
+				linked_file = file_dir_path + "/" + f
+				if path.exists(linked_file):
+					if path.islink(linked_file):
+						pic = self.enabled_pic
+					else:
+						remove(linked_file)
+						symlink(dir_path + "/" + f, file_dir_path + "/" + f)
+						pic = self.enabled_pic
+				else:
+					pic = self.disabled_pic
+				f_list.append((f, friendly_name, pic))
+		menu_list = [ ]
+		for entry in f_list:
+			menu_list.append((entry[0], entry[1], entry[2]))
+		self["menu"].updateList(menu_list)
+		self.selectionChanged()
+
+	def setPicture(self, f):
+		pic = f.replace(".xml", ".png")
+		preview = self.skin_base_dir + "preview/preview_" + pic
+		if path.exists(preview):
+			self["Picture"].instance.setPixmapFromFile(preview)
+			self["Picture"].show()
+		else:
+			self["Picture"].hide()
+	
+	def keyCancel(self):
+		self.close()
+
+	def runMenuEntry(self):
+		sel = self["menu"].getCurrent()
+		if sel is not None:
+			if sel[2] == self.enabled_pic:
+				remove(self.skin_base_dir + self.file_dir + "/" + sel[0])
+			elif sel[2] == self.disabled_pic:
+				symlink(self.skin_base_dir + self.screen_dir + "/" + sel[0], self.skin_base_dir + self.file_dir + "/" + sel[0])
+			self.createMenuList()
+			
+class DefaulSkinchange(ConfigListScreen, Screen):
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.session = session
+		self.skinName = "Setup"
+		Screen.setTitle(self, _("Default Skin Setup") + "...After selection and ok click box reboot!")
+		self.setup_title = _("Default Skin Setup") + "..."
+		config.defaultskinSetup = ConfigSubsection()
+		config.defaultskinSetup.steps = ConfigSelection([('default Utopia',_("default Utopia")),('default SmokeR',_("default SmokeR"))], default='nothing')
+
+                self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+		self["status"] = StaticText()
+		self['footnote'] = Label("testtesttest")
+                self["description"] = StaticText("now Using Bootlogo: ")
+		self["labelExitsave"] = Label("[Exit] = " +_("Cancel") +"              [Ok] =" +_("Save"))
+
+		self.onChangedEntry = [ ]
+		self.list = []
+		ConfigListScreen.__init__(self, self.list, session = self.session, on_change = self.changedEntry)
+		self.createSetup()
+
+		self["actions"] = ActionMap(["SetupActions", 'ColorActions'],
+		{
+			"ok": self.keySave,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel,
+			"green": self.keySave,
+			"menu": self.keyCancel,
+		}, -2)
+
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("OK"))
+		if not self.selectionChanged in self["config"].onSelectionChanged:
+			self["config"].onSelectionChanged.append(self.selectionChanged)
+		self.selectionChanged()
+
+	def createSetup(self):
+		self.editListEntry = None
+		self.list = []
+		self.list.append(getConfigListEntry(_("Default Skin Setup"), config.defaultskinSetup.steps))
+		
+		self["config"].list = self.list
+		self["config"].setList(self.list)
+		if config.usage.sort_settings.value:
+			self["config"].list.sort()
+
+	def selectionChanged(self):
+		self["status"].setText(self["config"].getCurrent()[0])
+
+	def changedEntry(self):
+		for x in self.onChangedEntry:
+			x()
+		self.selectionChanged()
+
+	def getCurrentEntry(self):
+		return self["config"].getCurrent()[0]
+
+	def getCurrentValue(self):
+		return str(self["config"].getCurrent()[1].getText())
+
+	def getCurrentDescription(self):
+		return self["config"].getCurrent() and len(self["config"].getCurrent()) > 2 and self["config"].getCurrent()[2] or ""
+
+	def createSummary(self):
+		from Screens.Setup import SetupSummary
+		return SetupSummary
+
+	def saveAll(self):
+
+		for x in self["config"].list:
+                        x[1].save()
+                configfile.save()
+                config.misc.skindefaultwizardenabled.value = False
+		config.misc.skindefaultwizardenabled.save()
+		configfile.save()
+                if config.defaultskinSetup.steps.value == "nothing":
+                        self.session.open(MessageBox,_("nothing selected Utopia will be used without reboot!"), MessageBox.TYPE_INFO, timeout=5)
+                        self.close()
+                else:        
+		        self.session.open(MessageBox,_("Box will reboot to activated selected Defaultskin"), MessageBox.TYPE_INFO, timeout=5)
+                        os.system("reboot")
+
+	def keySave(self):
+		self.saveAll()
+		self.close()
+
+	def cancelConfirm(self, result):
+		if not result:
+			return
+		for x in self["config"].list:
+			x[1].cancel()
+		self.close()
+
+	def keyCancel(self):
+		if self["config"].isChanged():
+			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"))
+		else:
+                	if config.defaultskinSetup.steps.value == "nothing":
+                		configfile.save()
+                		config.misc.skindefaultwizardenabled.value = False
+				config.misc.skindefaultwizardenabled.save()
+				configfile.save() 			
+			self.close() 			
