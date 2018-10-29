@@ -9,7 +9,7 @@
 
 from enigma import eTimer, ePicLoad, getDesktop, loadPic
 from Components.ActionMap import ActionMap
-from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigSelection, ConfigYesNo, NoSave, ConfigNothing, ConfigNumber
+from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigSelection, ConfigYesNo, NoSave, ConfigNothing, ConfigNumber, configfile, ConfigBoolean
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -201,7 +201,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
 			current_color = self.getCurrentColor()
 			color_choices = self.getPossibleColor()
 			default_color = ("default")
-			self.myNfrHD_style = NoSave(ConfigSelection(default=current_color, choices = color_choices))
+			config.myNfrHD_style = ConfigSelection(default=default_color, choices = color_choices)
 			if current_color is None:
 				current_color = default_color
 			if default_color not in color_choices:
@@ -211,7 +211,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
 			current_font = self.getCurrentFont() 
 			font_choices = self.getPossibleFont()
 			default_font = ("default")
-			self.myNfrHD_font = NoSave(ConfigSelection(default=current_font, choices = font_choices))		
+			config.myNfrHD_font = ConfigSelection(default=default_font, choices = font_choices)		
 			if current_font is None:
 				current_font = default_font
 			if default_font not in font_choices:
@@ -221,7 +221,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
 			current_infobar = self.getCurrentInfobar()
 			infobar_choices = self.getPossibleInfobar()
 			default_infobar = ("default")
-			self.myNfrHD_infobar = NoSave(ConfigSelection(default=current_infobar, choices = infobar_choices))		
+			config.myNfrHD_infobar = ConfigSelection(default=default_infobar, choices = infobar_choices)		
 			if current_infobar is None:
 				current_infobar = default_infobar
 			if default_infobar not in infobar_choices:
@@ -231,7 +231,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
                         current_sib = self.getCurrentSib() 
 			sib_choices = self.getPossibleSib()
 			default_sib = ("default")
-			self.myNfrHD_sib = NoSave(ConfigSelection(default=current_sib, choices = sib_choices))		
+			config.myNfrHD_sib = ConfigSelection(default=default_sib, choices = sib_choices)		
 			if current_sib is None:
 				current_sib = default_sib
 			if default_sib not in sib_choices:
@@ -241,7 +241,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
                         current_ch_se = self.getCurrentCh_se() 
 			ch_se_choices = self.getPossibleCh_se()
 			default_ch_se = ("default")
-			self.myNfrHD_ch_se = NoSave(ConfigSelection(default=current_ch_se, choices = ch_se_choices))		
+			config.myNfrHD_ch_se = ConfigSelection(default=default_ch_se, choices = ch_se_choices)		
 			if current_ch_se is None:
 				current_ch_se = default_ch_se
 			if default_ch_se not in ch_se_choices:
@@ -251,7 +251,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
                         current_ev = self.getCurrentEV() 
 			ev_choices = self.getPossibleEV()
 			default_ev = ("default")
-			self.myNfrHD_ev = NoSave(ConfigSelection(default=current_ev, choices = ev_choices))		
+			config.myNfrHD_ev = ConfigSelection(default=default_ev, choices = ev_choices)		
 			if current_ev is None:
 				current_ev = default_ev
 			if default_ev not in ev_choices:
@@ -259,33 +259,33 @@ class NfrHD_Config(Screen, ConfigListScreen):
 			current_ev = current_ev			
 		
 		myatile_active = self.getmyAtileState()
-		self.myNfrHD_active = NoSave(ConfigYesNo(default=myatile_active))
+		config.myNfrHD_active = ConfigYesNo(default=myatile_active)
 		#choices = self.getPossibleFont()
-		self.myNfrHD_fake_entry = NoSave(ConfigNothing())		
+		self.myNfrHD_fake_entry = ConfigNothing()		
 
 	def createConfigList(self):
-		self.set_myatile = getConfigListEntry(_("Enable %s pro:") % cur_skin, self.myNfrHD_active)
+		self.set_myatile = getConfigListEntry(_("Enable %s pro:") % cur_skin, config.myNfrHD_active)
 		self.set_new_skin = getConfigListEntry(_("Change skin"), ConfigNothing())
 		self.find_woeid = getConfigListEntry(_("Search weather location ID"), ConfigNothing())
 		self.list = []
 		self.list.append(self.set_myatile)
 		if color_test == True:
-                	self.set_color = getConfigListEntry(_("Style:"), self.myNfrHD_style)	
+                	self.set_color = getConfigListEntry(_("Style:"), config.myNfrHD_style)	
 			self.list.append(self.set_color)
 		if font_test == True:
-                	self.set_font = getConfigListEntry(_("Font:"), self.myNfrHD_font)	
+                	self.set_font = getConfigListEntry(_("Font:"), config.myNfrHD_font)	
 			self.list.append(self.set_font)
 		if infobar_test == True:
-                	self.set_infobar = getConfigListEntry(_("Infobar:"), self.myNfrHD_infobar)	
+                	self.set_infobar = getConfigListEntry(_("Infobar:"), config.myNfrHD_infobar)	
 			self.list.append(self.set_infobar)
 		if sib_test == True:
-		        self.set_sib = getConfigListEntry(_("Secondinfobar:"), self.myNfrHD_sib)
+		        self.set_sib = getConfigListEntry(_("Secondinfobar:"), config.myNfrHD_sib)
 			self.list.append(self.set_sib)
 		if ch_se_test == True:
-		        self.set_ch_se = getConfigListEntry(_("Channelselection:"), self.myNfrHD_ch_se)
+		        self.set_ch_se = getConfigListEntry(_("Channelselection:"), config.myNfrHD_ch_se)
 			self.list.append(self.set_ch_se)			
 		if ev_test == True:
-		        self.set_ev = getConfigListEntry(_("Eventview:"), self.myNfrHD_ev)
+		        self.set_ev = getConfigListEntry(_("Eventview:"), config.myNfrHD_ev)
 			self.list.append(self.set_ev)			
 		self.list.append(self.set_new_skin)
 		self.list.append(getConfigListEntry(_("---Weather---"), self.myNfrHD_fake_entry))
@@ -295,7 +295,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
 		self.list.append(getConfigListEntry(_("Location # (http://weather.yahoo.com/):"), config.plugins.NfrHD.woeid))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
-		if self.myNfrHD_active.value:
+		if config.myNfrHD_active.value:
 		        if cur_skin == "skin_default":
 			        self["key_yellow"].setText("skin_default Pro")
 			else:
@@ -306,24 +306,24 @@ class NfrHD_Config(Screen, ConfigListScreen):
 	def changedEntry(self):
 		if color_test == True:
                 	if self["config"].getCurrent() == self.set_color:
-				self.setPicture(self.myNfrHD_style.value)
+				self.setPicture(config.myNfrHD_style.value)
 		if font_test == True:		
 			if self["config"].getCurrent() == self.set_font:
-				self.setPicture(self.myNfrHD_font.value)
+				self.setPicture(config.myNfrHD_font.value)
 		if infobar_test == True:		
 			if self["config"].getCurrent() == self.set_infobar:
-				self.setPicture(self.myNfrHD_infobar.value)
+				self.setPicture(config.myNfrHD_infobar.value)
 		if sib_test == True:		
 			if self["config"].getCurrent() == self.set_sib:
-				self.setPicture(self.myNfrHD_sib.value)
+				self.setPicture(config.myNfrHD_sib.value)
 		if ch_se_test == True:		
 			if self["config"].getCurrent() == self.set_ch_se:
-				self.setPicture(self.myNfrHD_ch_se.value)				
+				self.setPicture(config.myNfrHD_ch_se.value)				
 		if ev_test == True:		
 			if self["config"].getCurrent() == self.set_ev:
-				self.setPicture(self.myNfrHD_ev.value)				
+				self.setPicture(config.myNfrHD_ev.value)				
 		if self["config"].getCurrent() == self.set_myatile:
-			if self.myNfrHD_active.value:
+			if config.myNfrHD_active.value:
 		        	if cur_skin == "skin_default":
 			        	self["key_yellow"].setText("skin_default Pro")
 				else:
@@ -334,22 +334,22 @@ class NfrHD_Config(Screen, ConfigListScreen):
 	def selectionChanged(self):
 		if color_test == True:	
 			if self["config"].getCurrent() == self.set_color:
-				self.setPicture(self.myNfrHD_style.value)
+				self.setPicture(config.myNfrHD_style.value)
 		if font_test == True:		
 			if self["config"].getCurrent() == self.set_font:
-				self.setPicture(self.myNfrHD_font.value)
+				self.setPicture(config.myNfrHD_font.value)
 		if infobar_test == True:		
 			if self["config"].getCurrent() == self.set_infobar:
-				self.setPicture(self.myNfrHD_infobar.value)
+				self.setPicture(config.myNfrHD_infobar.value)
 		if sib_test == True:		
 			if self["config"].getCurrent() == self.set_sib:
-				self.setPicture(self.myNfrHD_sib.value)
+				self.setPicture(config.myNfrHD_sib.value)
 		if ch_se_test == True:		
 			if self["config"].getCurrent() == self.set_ch_se:
-				self.setPicture(self.myNfrHD_ch_se.value)
+				self.setPicture(config.myNfrHD_ch_se.value)
 		if ev_test == True:		
 			if self["config"].getCurrent() == self.set_ev:
-				self.setPicture(self.myNfrHD_ev.value)
+				self.setPicture(config.myNfrHD_ev.value)
 		else:
 			self["Picture"].hide()
 
@@ -573,7 +573,7 @@ class NfrHD_Config(Screen, ConfigListScreen):
 			self["Picture"].hide()
 
 	def keyYellow(self):
-		if self.myNfrHD_active.value:
+		if config.myNfrHD_active.value:
 			self.session.openWithCallback(self.NfrHDScreenCB, NfrHDScreens)
 		else:
 			self["config"].setCurrentIndex(0)
@@ -631,39 +631,47 @@ class NfrHD_Config(Screen, ConfigListScreen):
 				remove(self.font_file)
 			elif path.islink(self.font_file):
 				remove(self.font_file)
-			if self.myNfrHD_font.value != 'default':
-				symlink(self.myNfrHD_font.value, self.font_file)
+			if config.myNfrHD_font.value != 'default':
+				symlink(config.myNfrHD_font.value, self.font_file)
 			if path.exists(self.color_file):
 				remove(self.color_file)
 			elif path.islink(self.color_file):
 				remove(self.color_file)
-			if self.myNfrHD_style.value != 'default':
-				symlink(self.myNfrHD_style.value, self.color_file)
+			if config.myNfrHD_style.value != 'default':
+				symlink(config.myNfrHD_style.value, self.color_file)
 			if path.exists(self.infobar_file):
 				remove(self.infobar_file)
 			elif path.islink(self.infobar_file):
 				remove(self.infobar_file)
-			if self.myNfrHD_infobar.value != 'default':
-				symlink(self.myNfrHD_infobar.value, self.infobar_file)
+			if config.myNfrHD_infobar.value != 'default':
+				symlink(config.myNfrHD_infobar.value, self.infobar_file)
 			if path.exists(self.sib_file):
 				remove(self.sib_file)
 			elif path.islink(self.sib_file):
 				remove(self.sib_file)
-			if self.myNfrHD_sib.value != 'default':
-				symlink(self.myNfrHD_sib.value, self.sib_file)
+			if config.myNfrHD_sib.value != 'default':
+				symlink(config.myNfrHD_sib.value, self.sib_file)
 			if path.exists(self.ch_se_file):
 				remove(self.ch_se_file)
 			elif path.islink(self.ch_se_file):
 				remove(self.ch_se_file)
-			if self.myNfrHD_ch_se.value != 'default':
-				symlink(self.myNfrHD_ch_se.value, self.ch_se_file)
+			if config.myNfrHD_ch_se.value != 'default':
+				symlink(config.myNfrHD_ch_se.value, self.ch_se_file)
 			if path.exists(self.ev_file):
 				remove(self.ev_file)
 			elif path.islink(self.ev_file):
 				remove(self.ev_file)
-			if self.myNfrHD_ev.value != 'default':
-				symlink(self.myNfrHD_ev.value, self.ev_file)                                                                		
-			if self.myNfrHD_active.value:
+			if config.myNfrHD_ev.value != 'default':
+				symlink(config.myNfrHD_ev.value, self.ev_file)                                                                		
+                        config.myNfrHD_font.save()
+                        config.myNfrHD_style.save()
+                        config.myNfrHD_infobar.save()
+                        config.myNfrHD_sib.save()
+                        config.myNfrHD_ch_se.save()
+                        config.myNfrHD_ev.save()
+                        configfile.save()
+                        
+                        if config.myNfrHD_active.value:
 				if not path.exists("mySkin") and path.exists("mySkin_off"):
 					symlink("mySkin_off","mySkin")
 			else:
@@ -855,3 +863,108 @@ class NfrHDScreens(Screen):
 			elif sel[2] == self.disabled_pic:
 				symlink(self.skin_base_dir + self.screen_dir + "/" + sel[0], self.skin_base_dir + self.file_dir + "/" + sel[0])
 			self.createMenuList()
+			
+class DefaulSkinchange(ConfigListScreen, Screen):
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.session = session
+		self.skinName = "Setup"
+		Screen.setTitle(self, _("Default Skin Setup") + "...After selection and ok click box reboot!")
+		self.setup_title = _("Default Skin Setup") + "..."
+		config.defaultskinSetup = ConfigSubsection()
+		config.defaultskinSetup.steps = ConfigSelection([('default Utopia',_("default Utopia")),('default SmokeR',_("default SmokeR"))], default='nothing')
+
+                self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+		self["status"] = StaticText()
+		self['footnote'] = Label("testtesttest")
+                self["description"] = StaticText("now Using Bootlogo: ")
+		self["labelExitsave"] = Label("[Exit] = " +_("Cancel") +"              [Ok] =" +_("Save"))
+
+		self.onChangedEntry = [ ]
+		self.list = []
+		ConfigListScreen.__init__(self, self.list, session = self.session, on_change = self.changedEntry)
+		self.createSetup()
+
+		self["actions"] = ActionMap(["SetupActions", 'ColorActions'],
+		{
+			"ok": self.keySave,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel,
+			"green": self.keySave,
+			"menu": self.keyCancel,
+		}, -2)
+
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("OK"))
+		if not self.selectionChanged in self["config"].onSelectionChanged:
+			self["config"].onSelectionChanged.append(self.selectionChanged)
+		self.selectionChanged()
+
+	def createSetup(self):
+		self.editListEntry = None
+		self.list = []
+		self.list.append(getConfigListEntry(_("Default Skin Setup"), config.defaultskinSetup.steps))
+		
+		self["config"].list = self.list
+		self["config"].setList(self.list)
+		if config.usage.sort_settings.value:
+			self["config"].list.sort()
+
+	def selectionChanged(self):
+		self["status"].setText(self["config"].getCurrent()[0])
+
+	def changedEntry(self):
+		for x in self.onChangedEntry:
+			x()
+		self.selectionChanged()
+
+	def getCurrentEntry(self):
+		return self["config"].getCurrent()[0]
+
+	def getCurrentValue(self):
+		return str(self["config"].getCurrent()[1].getText())
+
+	def getCurrentDescription(self):
+		return self["config"].getCurrent() and len(self["config"].getCurrent()) > 2 and self["config"].getCurrent()[2] or ""
+
+	def createSummary(self):
+		from Screens.Setup import SetupSummary
+		return SetupSummary
+
+	def saveAll(self):
+
+		for x in self["config"].list:
+                        x[1].save()
+                configfile.save()
+                config.misc.skindefaultwizardenabled.value = False
+		config.misc.skindefaultwizardenabled.save()
+		configfile.save()
+                if config.defaultskinSetup.steps.value == "nothing":
+                        self.session.open(MessageBox,_("nothing selected Utopia will be used without reboot!"), MessageBox.TYPE_INFO, timeout=5)
+                        self.close()
+                else:        
+		        self.session.open(MessageBox,_("Box will reboot to activated selected Defaultskin"), MessageBox.TYPE_INFO, timeout=5)
+                        os.system("reboot")
+
+	def keySave(self):
+		self.saveAll()
+		self.close()
+
+	def cancelConfirm(self, result):
+		if not result:
+			return
+		for x in self["config"].list:
+			x[1].cancel()
+		self.close()
+
+	def keyCancel(self):
+		if self["config"].isChanged():
+			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"))
+		else:
+                	if config.defaultskinSetup.steps.value == "nothing":
+                		configfile.save()
+                		config.misc.skindefaultwizardenabled.value = False
+				config.misc.skindefaultwizardenabled.save()
+				configfile.save() 			
+			self.close() 			
