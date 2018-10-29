@@ -49,6 +49,8 @@ class About(Screen):
 		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dm900', 'dags7252', '8100s'):
 			cpuMHz = "   (1,7 GHz)"
 		elif getMachineBuild() in ('sf5008','et13000','et1x000','hd52','hd51','sf4008','vs1500','h7'):
+			cpuMHz = "   (2,0 GHz)"
+		elif getMachineBuild() in ('sf5008','et13000','et1x000','hd52','hd51','sf4008','vs1500','h7'):
                         try:
 				import binascii
 				f = open('/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency', 'rb')
