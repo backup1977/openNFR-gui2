@@ -82,13 +82,14 @@ if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/MultiQuickButton/p
 		pass
 
 from Screens.CronTimer import *
-from Plugins.Extensions.Infopanel.skin_setup import NfrHD_Config
+from Plugins.Extensions.Infopanel.skin_setup import NfrHD_Config, DefaulSkinchange
 from Plugins.Extensions.Infopanel.UserMainMenu import UserMainMenuConfig
 from Plugins.Extensions.Infopanel.ScriptRunner import *
 from Plugins.Extensions.Infopanel.bootvideo import BootvideoSetupScreen
 from Plugins.Extensions.Infopanel.bootlogo import BootlogoSetupScreen, RadiologoSetupScreen
 from Plugins.Extensions.Infopanel.diskspeed import Disk_Speed
 from Plugins.Extensions.Infopanel.iptv_convert import IPTV
+from Plugins.Extensions.Infopanel.easy_setup import EasySetup
 from Screens.HddSetup import HddSetup
 from Screens.HddMount import HddFastRemove
 from Screens.Swap import SwapOverviewScreen
@@ -361,6 +362,7 @@ class Infopanel(Screen, InfoBarPiP):
 		self.Mlist.append(MenuEntryItem((InfoEntryComponent ("PluginManager" ), _("Plugin-Manager"), ("plugin-manager"))))
 		self.Mlist.append(MenuEntryItem((InfoEntryComponent ("QuickMenu" ), _("Quick-Menu"), ("QuickMenu"))))
 		self.Mlist.append(MenuEntryItem((InfoEntryComponent('Extras'), _("Extras"), 'Extras')))
+		self.Mlist.append(MenuEntryItem((InfoEntryComponent('easy-setup'), _("EasySetup"), 'easy-setup')))		
 		self.Mlist.append(MenuEntryItem((InfoEntryComponent('Infos'), _("Infos"), 'Infos')))
 
 		self.onChangedEntry = []
@@ -548,7 +550,9 @@ class Infopanel(Screen, InfoBarPiP):
 		elif menu == "DiskSpeed":
 			self.session.open(Disk_Speed)
 		elif menu == "m3u-convert":
-			self.session.open(IPTV)			
+			self.session.open(IPTV)
+		elif menu == "easy-setup":
+			self.session.open(EasySetup)                        			
 		elif menu == "PasswordChange":
 			self.session.open(NFRPasswdScreen)
 		elif menu == "UserMainMenu":
@@ -601,6 +605,8 @@ class Infopanel(Screen, InfoBarPiP):
 			self.session.open(HddSetup)
 		elif menu == "SwapManager":
 			self.session.open(SwapOverviewScreen)
+		elif menu == "DefaulteSkin-Steps":
+			self.session.open(DefaulSkinchange)				
 		elif menu == "Volume-Steps":
 			self.session.open(VolumeSteps)			
 		elif menu == "Red-Key-Action":
@@ -716,7 +722,7 @@ class Infopanel(Screen, InfoBarPiP):
 		self.oldmlist = []
 		self.oldmlist = self.Mlist
                 self.tlist.append(MenuEntryItem((InfoEntryComponent('ImageUpdateCheck'), _("ImageUpdateCheck"), 'ImageUpdateCheck')))
-                self.tlist.append(MenuEntryItem((InfoEntryComponent ("SoftwareManager" ), _("Software update"), ("software-update"))))
+                #self.tlist.append(MenuEntryItem((InfoEntryComponent ("SoftwareManager" ), _("Software update"), ("software-update"))))
 		self.tlist.append(MenuEntryItem((InfoEntryComponent ("ImageBackup" ), _("Software Backup"), ("backup-image"))))
 		self.tlist.append(MenuEntryItem((InfoEntryComponent ("Flash_local" ), _("Flash local online"), ("flash-local"))))
 		self.tlist.append(MenuEntryItem((InfoEntryComponent ("BackupFiles" ), _("Choose backup files"), ("backup-files"))))
@@ -734,6 +740,7 @@ class Infopanel(Screen, InfoBarPiP):
 		self.oldmlist = []
 		self.oldmlist = self.Mlist
 		self.tlist.append(MenuEntryItem((InfoEntryComponent('SkinSetup'), _("SkinSetup"), 'SkinSetup')))
+		self.tlist.append(MenuEntryItem((InfoEntryComponent('DefaulteSkin-Steps'), _("DefaulteSkin-Steps"), 'DefaulteSkin-Steps')))
 		self.tlist.append(MenuEntryItem((InfoEntryComponent('Volume-Steps'), _("VolumeSteps"), 'Volume-Steps')))		
 		self.tlist.append(MenuEntryItem((InfoEntryComponent('Red-Key-Action'), _("Red Panel"), 'Red-Key-Action')))
 		self.tlist.append(MenuEntryItem((InfoEntryComponent('Red-Key-Action-Long'), _("Red Panel Long"), 'Red-Key-Action-Long')))
@@ -1800,7 +1807,7 @@ class NFRPasswdScreen(Screen):
     def SetPasswd(self):
         self.container = eConsoleAppContainer()
         self.container.appClosed.append(self.runFinished)
-        self.container.dataAvail.append(self.dataAvail)
+        self.container.dataAvail.append(self.processOutputLine)
         retval = self.container.execute('passwd %s' % self.user)
         if retval == 0:
             self.session.open(MessageBox, _('Sucessfully changed password for root user to:\n%s ' % self.password), MessageBox.TYPE_INFO)

@@ -44,10 +44,12 @@ class About(Screen):
 			cpuMHz = "   (1,5 GHz)"
 		elif getMachineBuild() in ('formuler1', 'triplex'):
 			cpuMHz = "   (1,3 GHz)"
-		elif getMachineBuild() in ('u5','u5pvr'):
+		elif getMachineBuild() in ('u51','u5','u52','u5pvr','h9','cc1','sf8008','hd60','i55plus'):
 			cpuMHz = "   (1,6 GHz)"			
-		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dags7252'):
+		elif getMachineBuild() in ('vuuno4k','vuultimo4k', 'gb7252', 'dags7252', '8100s'):
 			cpuMHz = "   (1,7 GHz)"
+		elif getMachineBuild() in ('alien5','u53'):
+			cpuMHz = "   (2,0 GHz)"
 		elif getMachineBuild() in ('sf5008','et13000','et1x000','hd52','hd51','sf4008','vs1500','h7'):
                         try:
 				import binascii
@@ -74,14 +76,83 @@ class About(Screen):
 
 		AboutText += _("CPU:\t\t%s") % about.getCPUString() + cpuMHz + "\n"
 		AboutText += _("Cores:\t\t%s") % about.getCpuCoresString() + "\n"
-		imagestarted = ""
+		
+                tempinfo = ""
+		if path.exists('/proc/stb/sensors/temp0/value'):
+			f = open('/proc/stb/sensors/temp0/value', 'r')
+			tempinfo = f.read()
+			f.close()
+		elif path.exists('/proc/stb/fp/temp_sensor'):
+			f = open('/proc/stb/fp/temp_sensor', 'r')
+			tempinfo = f.read()
+			f.close()
+		elif path.exists('/proc/stb/sensors/temp/value'):
+			f = open('/proc/stb/sensors/temp/value', 'r')
+			tempinfo = f.read()
+			f.close()
+		if tempinfo and int(tempinfo.replace('\n', '')) > 0:
+			mark = str('\xc2\xb0')
+			AboutText += _("System temperature: %s") % tempinfo.replace('\n', '') + mark + "C\n\n"
+
+		tempinfo = ""
+		if path.exists('/proc/stb/fp/temp_sensor_avs'):
+			f = open('/proc/stb/fp/temp_sensor_avs', 'r')
+			tempinfo = f.read()
+			f.close()
+		elif path.exists('/proc/stb/power/avs'):
+			f = open('/proc/stb/power/avs', 'r')
+			tempinfo = f.read()
+			f.close()
+		elif path.exists('/sys/devices/virtual/thermal/thermal_zone0/temp'):
+			try:
+				f = open('/sys/devices/virtual/thermal/thermal_zone0/temp', 'r')
+				tempinfo = f.read()
+				tempinfo = tempinfo[:-4]
+				f.close()
+			except:
+				tempinfo = ""
+		elif path.exists('/proc/hisi/msp/pm_cpu'):
+			try:
+				for line in open('/proc/hisi/msp/pm_cpu').readlines():
+					line = [x.strip() for x in line.strip().split(":")]
+					if line[0] in ("Tsensor"):
+						temp = line[1].split("=")
+						temp = line[1].split(" ")
+						tempinfo = temp[2]
+			except:
+				tempinfo = ""
+		if tempinfo and int(tempinfo.replace('\n', '')) > 0:
+			mark = str('\xc2\xb0')
+			AboutText += _("Processor temperature:\t%s") % tempinfo.replace('\n', '').replace(' ','') + mark + "C\n"
+                imagestarted = ""
 		bootname = ''
 	        if path.exists('/boot/bootname'):
 	                f = open('/boot/bootname', 'r')
 		        bootname = f.readline().split('=')[1]
 		        f.close()
 
-		if path.exists('/boot/STARTUP'):
+		if getMachineBuild() in ('cc1','sf8008'):
+			if path.exists('/boot/STARTUP'):
+				f = open('/boot/STARTUP', 'r')
+				f.seek(5)
+				image = f.read(4)
+				if image == "emmc":
+					image = "1"
+				elif image == "usb0":
+					f.seek(13)
+					image = f.read(1)
+					if image == "1":
+						image = "2"
+					elif image == "3":
+						image = "3"
+					elif image == "5":
+						image = "4"
+					elif image == "7":
+						image = "5"
+				f.close()
+				if bootname: bootname = "   (%s)" %bootname 
+				AboutText += _("Selected Image:\t\t%s") % "STARTUP_" + image + bootname + "\n"
+		elif path.exists('/boot/STARTUP'):
 			f = open('/boot/STARTUP', 'r')
 			f.seek(22)
 			image = f.read(1) 
@@ -107,32 +178,19 @@ class About(Screen):
 			fp_version = ""
 		elif fp_version != 0:
 			fp_version = _("Front Panel:\t\t%s") % fp_version 
-			AboutText += fp_version + "\n\n"
+			AboutText += fp_version + "\n"
 		else:
 			fp_version = _("Front Panel:\t\tVersion unknown")
-			AboutText += fp_version + "\n\n"
+			AboutText += fp_version + "\n"
 
 		AboutText += _("Installed:\t\t%s") % about.getFlashDateString() + "\n"			
 		AboutText += _("Last Upgrade:\t\t%s") % about.getLastUpdateString() + "\n\n" 
-		AboutText += _("WWW:\t\t%s") % about.getImageUrlString() + "\n\n"
-		AboutText += _("based on:\t\t%s") % "www.github.com/oe-alliance" + "\n\n"
-
+		
 		self["FPVersion"] = StaticText(fp_version)
 
-		tempinfo = ""
-		if path.exists('/proc/stb/sensors/temp0/value'):
-			f = open('/proc/stb/sensors/temp0/value', 'r')
-			tempinfo = f.read()
-			f.close()
-		elif path.exists('/proc/stb/fp/temp_sensor'):
-			f = open('/proc/stb/fp/temp_sensor', 'r')
-			tempinfo = f.read()
-			f.close()
-		if tempinfo and int(tempinfo.replace('\n', '')) > 0:
-			mark = str('\xc2\xb0')
-			AboutText += _("System temperature: %s") % tempinfo.replace('\n', '') + mark + "C\n\n"
-
-		# don't remove the string out of the _(), or it can't be "translated" anymore.
+		AboutText += _("WWW:\t\t%s") % about.getImageUrlString() + "\n\n"
+		AboutText += _("based on:\t\t%s") % "www.github.com/oe-alliance" + "\n\n"
+                # don't remove the string out of the _(), or it can't be "translated" anymore.
 		# TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
 		info = _("TRANSLATOR_INFO")
 
