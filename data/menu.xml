@@ -145,7 +145,7 @@ def msgClosed(ret):
 self.session.openWithCallback(msgClosed, FactoryReset)
 </code>
 			</item>
-			<item weight="15" level="0" text="Software update" entryID="software_update"><screen module="SoftwareUpdate" screen="UpdatePlugin" /></item>
+			<!--item weight="15" level="0" text="Software update" entryID="software_update"><screen module="SoftwareUpdate" screen="UpdatePlugin" /></item-->
 		</menu>
 		<menu weight="5" level="0" text="Information" entryID="info_screen">
 			<id val="information" />
@@ -167,6 +167,7 @@ self.session.openWithCallback(msgClosed, FactoryReset)
 			<item text="MultiBoot" requires="HaveMultiBootHD" entryID="deep_standby"><screen module="MultiBootStartup" screen="MultiBootStartup" /></item>
 			<item text="MultiBoot" requires="HaveMultiBootGB" entryID="deep_standby"><screen module="MultiBootStartupGB" screen="MultiBootStartup" /></item>
 			<item text="MultiBoot" requires="HaveMultiBootCY" entryID="deep_standby"><screen module="MultiBootStartupCY" screen="MultiBootStartup" /></item>
+			<item text="MultiBoot" requires="HaveMultiBootDS" entryID="deep_standby"><screen module="MultiBootStartupDS" screen="MultiBootStartup" /></item>
 			<item level="0" requires="loadcidriver" text="Reboot with CI+ Driver">
 <code>
 from boxbranding import getBoxType

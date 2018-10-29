@@ -73,6 +73,9 @@ class IPTV_glob(Screen):
                 line = line.replace('#EXTINF:-1 tvg-shift=2 ,','#DESCRIPTION: ')
                 line = line.replace('#EXTINF:-1 group-title=','#DESCRIPTION: ')            
                 line = line.replace('#EXTINF:','#DESCRIPTION: ')
+                if 'group-title=' in line:
+                    line1 = line.split('group-title=')[1]
+                    line = "#DESCRIPTION:  " + line1		
                 line = line.replace('tvg-name=','')
                 line = line.replace('tvg-shift=2 ,','')
                 line = line.replace('tvg-shift=2 tvg-logo=-TV ,','')
@@ -208,7 +211,7 @@ class IPTV(Screen):
         self["key_yellow"] = Label(_("Install all"))
         self["key_blue"] = Label(_("Download IPTV-lists"))       
         self.onLayoutFinish.append(self.layoutFinished)
-        
+
     def m3uliststart(self):
         self.m3ulist = []
         for fAdd in glob ('/etc/enigma2/*.m3u'):
@@ -281,9 +284,10 @@ class IPTV(Screen):
         self.type = "TV"
         for l in self.iptvlist:
             self.convert = True
-            name_file = self.file_filter(l)
-            file = l         
-            self.Convert_m3u(l, file)
+            file = l 
+            self.IPTV_glob = IPTV_glob(l, file)
+            name_file = self.IPTV_glob.file_filter(l)
+            self.IPTV_glob.Convert_m3u(l, file)
             infotext = _('M3U Converter\n')
             infotext += _('IPTV m3u Files convert to bouquetslist')
             infotext += _('\n\n\n')
