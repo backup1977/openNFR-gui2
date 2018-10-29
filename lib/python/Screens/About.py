@@ -189,8 +189,8 @@ class About(Screen):
 		self["FPVersion"] = StaticText(fp_version)
 
 		AboutText += _("WWW:\t\t%s") % about.getImageUrlString() + "\n\n"
-		AboutText += _("Image Build:\t\t%s") % "by Ghani" + "\n\n"
-		# don't remove the string out of the _(), or it can't be "translated" anymore.
+		AboutText += _("based on:\t\t%s") % "www.github.com/oe-alliance" + "\n\n"
+                # don't remove the string out of the _(), or it can't be "translated" anymore.
 		# TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
 		info = _("TRANSLATOR_INFO")
 
