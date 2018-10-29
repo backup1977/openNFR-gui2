@@ -672,7 +672,7 @@ msgid "Activate PiP"
 msgstr "Aktiviere PiP"
 
 msgid "Activate Picture in Picture"
-msgstr "Aktiviere Bild in Bild"
+msgstr "Bild in Bild aktivieren"
 
 msgid "Turn on HDMI-IN Full screen mode"
 msgstr "HDMI IN als Vollbild wiedergeben"
@@ -7426,6 +7426,9 @@ msgstr "System"
 msgid "System temperature: %s"
 msgstr "Systemtemperatur: %s"
 
+msgid "Processor temperature:\t%s"
+msgstr "Processor Temperatur:\t%s"
+
 msgid "System: "
 msgstr ""
 
@@ -13821,3 +13824,200 @@ msgstr "Download openNFR-Skins"
 
 msgid "Second cable of motorized LNB"
 msgstr "Zweites Kabel vom Rotor"
+
+msgid "Preferred tuner for recordings"
+msgstr "Bevorzugter Tuner für Aufnahmen"
+
+msgid "You have installed Softcamfeed, with this Ci+ Installation will be broken! You will deinstall Softcamfeed manually?"
+msgstr "Sie haben den Softcamfeed installiert, dadurch wird die CI+ Installation zerstört! Wollen Sie den Softcamfeed deinstallieren?"
+
+msgid "Preferred tuners for recordings, multiple selection allowed"
+msgstr "Bevorzugte Tuner für Aufnahmen, mehrfachauswahl erlaubt"
+
+msgid "In expert mode, configure which tuners will be preferred for recordings, when more than one tuner is available."
+msgstr "Konfigurieren Sie im Expertenmodus, welche Tuner für Aufnahmen bevorzugt werden, wenn mehr als ein Tuner verfügbar ist."
+
+msgid "Configure which tuner for recordings will be preferred, when more than one tuner is available."
+msgstr "Konfigurieren Sie, welcher Tuner für Aufnahmen bevorzugt wird, wenn mehr als ein Tuner verfügbar ist."
+
+msgid "Experimental mode"
+msgstr "Experimenteller Modus"
+
+msgid "Experimental: strict limitation to preferred tuners for recordings"
+msgstr "Experimentell: Strenge Beschränkung auf bevorzugte Tuner für Aufnahmen"
+
+msgid "Configure whether another tuner from the preferred list is allocated for recordings instead of sharing a tuner that is already active receiving the same live TV channel."
+msgstr "Konfigurieren Sie, ob ein anderer Tuner aus der bevorzugten Liste für Aufnahmen zugewiesen wird, anstatt einen Tuner zu teilen falls er bereits aktiv ist und denselben Live-TV Kanal empfängt."
+
+msgid "Default Skin Setup"
+msgstr "Standard Skin Auswahl"
+
+msgid "Configure which tuner will be preferred for recordings, when more than one tuner is available. 'Disabled' would select a tuner based on preferred tuner in customise screen. 'Auto' would choose based on E2's default rules, ignoring preferred tuner in customise screen."
+msgstr "Konfigurieren Sie, welcher Tuner für Aufnahmen bevorzugt wird, wenn mehr als ein Tuner verfügbar ist. 'Deaktiviert' würde einen Tuner auf der Basis des bevorzugten Tuners auswählen. 'Auto' würde basierend auf den Standardregeln von E2 auswählen und den bevorzugten Tuner im Bildschirm ignorieren."
+
+msgid ""
+"You have installed Softcamfeed, with this Ci+ Installation will be broken!\n"
+"\n" 
+"You will deinstall Softcamfeed manually?"
+
+msgstr ""
+"Du hast Softcamfeed installiert, damit funktioniert Ci + nicht mehr!\n"
+"\n"
+"Du deinstallierst Softcamfeed manuell?"
+
+msgid "Preferred tuners, multiple selection allowed"
+msgstr "Bevorzugte Tuner, Mehrfachauswahl möglich"
+
+msgid "Experimental: strict limitation to preferred tuners"
+msgstr "Experimentell: strikte Beschränkung auf bevorzugte Tuner"
+
+msgid "In expert mode, configure which tuners will be preferred, when more than one tuner is available."
+msgstr "Konfiguriere im Expertenmodus, welche von mehreren Tunern bevorzugt benutzt werden sollen."
+
+msgid "Configure whether another tuner from the preferred list is allocated instead of sharing a tuner that is already active recording the same channel."
+msgstr "Konfiguriere, ob ein weiterer bevorzugter Tuner belegt wird, selbst wenn ein anderer Tuner mit verwendet werden könnte, der den gleichen Kanal aufnimmt."
+
+msgid ""
+"\n"
+"<This tuner is configured automatically>"
+msgstr ""
+"\n"
+"<Dieser Tuner wird automatisch verwaltet>"
+
+msgid "Clock"
+msgstr "Uhr"
+
+msgid "Press left/right to select Image"
+msgstr "Drücke links / rechts, um ein Image auszuwählen"
+
+msgid "Enable Quad PIP"
+msgstr "Quad-PIP aktivieren"
+
+msgid "Quad PiP Channel Selection"
+msgstr "Quad-PiP-Senderauswahl"
+
+msgid "  Red key : Show/Hide channel name"
+msgstr "Rote Taste: Sendernamen an/aus"
+
+msgid "  Menu key : Select quad channel"
+msgstr "Menütaste: Quad-PiP Senderwahl"
+
+msgid "Choice where to put %s "
+msgstr "Wähle Position für %s "
+
+msgid ""
+"EPG key : Switch to quad PiP entry\n"
+"Ok key : Add to new entry\n"
+"PVR key : Input channel name\n"
+"Exit key : Finish channel edit"
+msgstr ""
+"Wähle eine der folgenden Tasten...\n"
+"\n"
+"Ok :  Als neuen Eintrag hinzufügen\n"
+"\n"
+"EPG : Zum Quad-PiP-Eintrag wechseln\n"
+"\n"
+"PVR : Sendernamen eingeben\n"
+"\n"
+"Exit : Senderbearbeitung beenden"
+
+msgid "Configure the duration in minutes and action, which could be shut down or standby, for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer" 
+msgstr "Konfiguriere die Dauer in Minuten und Aktion, könnte also herunterfahren oder in den Standby-Modus schalten sein. Eintrag wählen und auf OK oder grün klicken, um den Sleeptimer zu starten/zu stoppen"
+
+##Easy_Setup
+
+msgid "Enable Fullbackup after Easy-Setup?"
+msgstr "Aktiviere Fullbackup nach dem Easy-Setup?"
+
+msgid "Default is enable and Fullbackup will start after all Setups are ready."
+msgstr "Als Standard aktiviert und das Fullbackup startet nach dem Ende des Easy-Setups."
+
+msgid "Enable HDD/USB/SD Mounts Setup?"
+msgstr "Aktiviere HDD/USB/SD Mount Einstellungen?"
+
+msgid "Choose your Device mounts (USB, HDD, others...)."
+msgstr "Wähle deine Mount Einstellungen für (HDD, USB usw)."
+
+msgid "Enable Records Setup?"
+msgstr "Aktiviere Aufnahme Einstellungen?"
+
+msgid "Choose your recording config."
+msgstr "Wähle deine Aufnahme Konfiguration."
+
+msgid "Enable Timeshift Setup?"
+msgstr "Aktiviere Timeshift Einstellungen?"
+
+msgid "Choose your timeshift config."
+msgstr "Wähle deine Timeshift Konfiguration."
+
+msgid "Enable Keymap Setup?"
+msgstr "Aktiviere Keymap Einstellungen?"
+
+msgid "Choose your keymap."
+msgstr "Wähle deine Keymap."
+
+msgid "Enable Hotkey Setup?"
+msgstr "Aktiviere Hotkey Setup?"
+
+msgid "Choose your remote buttons."
+msgstr "Wähle die Tasten deiner Fernbedienung."
+
+msgid "Enable Channellist Setup?"
+msgstr "Aktiviere Kanallisten Einstellungen?"
+
+msgid "Choose your Channel selection config."
+msgstr "Wähle deine Kanallisten Konfiguration."
+
+msgid "Enable M3U Convert to Channellist Setup?"
+msgstr "Aktiviere M3U-Converter zur Senderliste?"
+
+msgid "Install your IPTV-m3u-files into channellist.\nFirst you must coppy a M3U-List to /etc/enigma2"
+msgstr "Installiere deine IPTV-m3u-Liste in die Senderliste.\nZuerst musst du eine M3U-Liste nach /etc/enigma2 kopieren"
+
+msgid "Enable Menusort Setup?"
+msgstr "Aktiviere Menusort Einstellungen?"
+
+msgid "Choose your Mainmenu sorts."
+msgstr "Wähle deine Hauptmenü Sortierung."
+
+msgid "Enable HDMI-CEC Setup?"
+msgstr "Aktiviere HDMI-CEC Einstellungen?"
+
+msgid "Choose your HDMI-CEC config."
+msgstr "Wähle deine HDMI-CEC Einstellungen."
+
+msgid "Enable Password change?"
+msgstr "Aktiviere Passwort Änderung?"
+
+msgid "Change the rootpassword for login in ftp, telnet and webif."
+msgstr "Ändere das Rootpasswort für das Login per FTP, Telnet und WebIF."
+
+msgid "Enable Display Setup?"
+msgstr "Aktiviere Display Einstellungen?"
+
+msgid "Choose your Display config."
+msgstr "Wähle deine Display Konfiguration."
+
+msgid "Enable Position Setup?"
+msgstr "Aktiviere Positions Einstellungen?"
+
+msgid "Choose your OSD Position in TV"
+msgstr "Wähle deine OSD Einstellungen für dein TV."
+
+msgid "Enable OpenWebif Setup?"
+msgstr "Aktiviere OpenWebIF Einstellungen?"
+
+msgid "Choose your Openwebif config."
+msgstr "Wähle deine OpenWebIF Konfiguration."
+
+msgid "Enable OpenNFR-Addons Setup?"
+msgstr "Aktiviere OpenNFR-Addons Einstellungen?"
+
+msgid "Install OpenNFR Plugins."
+msgstr "Installiere OpenNFR Plugins."
+
+msgid "Enable Power Off Menu Setup?"
+msgstr "Aktiviere Ausschaltmenü Einstellungen?"
+
+msgid "Choose your Powerbutton Funktion on Remotecontrol."
+msgstr "Wähle die Funktion des Ausschalteschalters deiner Fernbedienung."
