@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-.
+# -*- coding: utf-8 -*-
 
 #This plugin is free software, you are allowed to
 #modify it (if you keep the license),
