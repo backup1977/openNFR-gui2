@@ -844,6 +844,7 @@ CXXFLAGS="$CXXFLAGS -Wall $BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_C
 AX_SWIG_PYTHON_OPT="$AX_SWIG_PYTHON_OPT -DSWIG_PYTHON_LEGACY_BOOL"
 
 AC_CONFIG_FILES([
+	Makefile
 	data/Makefile
 	data/bootvideos/Makefile
 	data/bootlogos/Makefile
@@ -1006,5 +1007,6 @@ AC_CONFIG_FILES([
 	main/Makefile
 	tools/Makefile
 	tools/enigma2.sh
-	enigma2.pc])
+	enigma2.pc
+	])
 AC_OUTPUT
